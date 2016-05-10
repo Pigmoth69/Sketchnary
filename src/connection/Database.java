@@ -158,5 +158,81 @@ public class Database {
 		}
 
 	}
+	
+	public void deleteFromDatabase(int id_player){
+		
+		Statement statement;
+
+		try {
+
+			statement = connection.createStatement();
+
+			statement.executeUpdate("DELETE FROM Player WHERE id = " + id_player);
+
+			System.out.println("Deleted player successfully!");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void deleteFromDatabase(int id_player, int id_friend){
+		
+		Statement statement;
+
+		try {
+
+			statement = connection.createStatement();
+
+			statement.executeUpdate("DELETE FROM Friend WHERE id_player = " + id_player + " AND id_friend = " + id_friend + ";");
+
+			System.out.println("Deleted friend sucessfully!");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void addFriend(int id_player, int id_friend){
+		
+		Statement statement;
+
+		try {
+
+			statement = connection.createStatement();
+
+			statement.executeUpdate("INSERT INTO Friend (id_player, id_friend) VALUES (" + id_player + "," + id_friend + ");");
+
+			System.out.println("Added friend successfully!");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void addPlayer(Player player){
+		
+		Statement statement;
+
+		try {
+
+			statement = connection.createStatement();
+
+			statement.executeUpdate("INSERT INTO Player (id, username, password, name, email, age, country) VALUES (" 
+			+ player.getId() + ",'" + player.getUsername() + "','" + player.getPassword() + "','" 
+					+ player.getName() + "','" + player.getEmail() + "',"
+					+ player.getAge() + ",'" + player.getCountry() + "');");
+
+			System.out.println("Added player successfully!");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+	}
 
 }
