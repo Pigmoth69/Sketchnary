@@ -16,13 +16,9 @@ import com.sun.net.httpserver.HttpsServer;
 public class HttpsServerHandler {
 
 	private Server server;
-	private int port;
 
-	private boolean isServerDone = false;
-
-	public HttpsServerHandler(Server server, int port) {
+	public HttpsServerHandler(Server server) {
 		this.server = server;
-		this.port = port;
 	}
 
 	private SSLContext createSSLContext() {
