@@ -3,19 +3,24 @@ package https;
 import server.*;
 
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.security.KeyStore;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
-public class HttpsServer {
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsServer;
+
+public class HttpsServerHandler {
 
 	private Server server;
 	private int port;
 
 	private boolean isServerDone = false;
 
-	public HttpsServer(Server server, int port) {
+	public HttpsServerHandler(Server server, int port) {
 		this.server = server;
 		this.port = port;
 	}
@@ -42,19 +47,23 @@ public class HttpsServer {
 		return sslContext;
 	}
 
-	// Start to run the server
-	public void run() {
-		// HttpsServer httpserver = HttpsServer.create(new
-		// InetSocketAddress(443), 0);
-		// httpserver.setHttpsConfigurator(new
-		// HttpsConfigurator(createSSLContext()));
-		// httpserver.createContext("/api", new API());
-		// httpserver.setExecutor(null);
-		// httpserver.start();
-	}
-
-	public void httpsServer() {
-
+	public void setup() {
+		
+		HttpsServer httpserver;
+		
+		try {
+			
+			httpserver = HttpsServer.create(new InetSocketAddress(443), 0);
+			httpserver.setHttpsConfigurator(new HttpsConfigurator(createSSLContext()));
+			
+			httpserver.createContext("/https", new HttpsConnection());
+			httpserver.setExecutor(null);
+			httpserver.start();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }
