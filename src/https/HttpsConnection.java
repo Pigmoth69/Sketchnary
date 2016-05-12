@@ -2,6 +2,7 @@ package https;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -32,7 +33,7 @@ public class HttpsConnection implements HttpHandler {
 		try {
 			process(exchange, method, paths, filtered);
 		} catch (Exception e) {
-			response(exchange, error(method, filtered, "Unknown error."), 500);
+			response(exchange, "Unknown error");
 		}
 
 	}
@@ -47,7 +48,7 @@ public class HttpsConnection implements HttpHandler {
 		if (paths[1].equals("event"))
 			processEvent(exchange, method, body, paths, filtered);
 		else
-			response(exchange, "Not an event.", 200);
+			response(exchange, "Not an event.");
 
 	}
 
@@ -74,7 +75,6 @@ public class HttpsConnection implements HttpHandler {
 			break;
 		default:
 			break;
-			
 		
 		}
 		
@@ -108,14 +108,23 @@ public class HttpsConnection implements HttpHandler {
 
 	}
 
-	private void response(HttpExchange exchange, Object error, int i) {
-		// TODO Auto-generated method stub
+	private void response(HttpExchange exchange, String error) {
+		
+		try {
+			exchange.sendResponseHeaders(200, error.getBytes().length);
+		} catch (IOException error1) {
+			error1.printStackTrace();
+		}
+		
+		OutputStream output = exchange.getResponseBody();
+		
+		try {
+			output.write(error.getBytes());
+			output.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-	}
-
-	private String error(String method, HashMap<String, String> filtered, String string) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
