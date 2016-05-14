@@ -102,7 +102,7 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		serverData.updateFriendsList();
 
 	}
@@ -129,8 +129,8 @@ public class Database {
 		try {
 			statement = connection.createStatement();
 
-			statement.executeUpdate("INSERT INTO friend (id_player, id_friend) " + "VALUES ("
-					+ friend.getIdPlayer() + ", " + friend.getIdFriend() + ");");
+			statement.executeUpdate("INSERT INTO friend (id_player, id_friend) " + "VALUES (" + friend.getIdPlayer()
+					+ ", " + friend.getIdFriend() + ");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -155,9 +155,9 @@ public class Database {
 		}
 
 	}
-	
-	public void deleteFromDatabase(int id_player){
-		
+
+	public void deleteFromDatabase(int id_player) {
+
 		Statement statement;
 
 		try {
@@ -171,106 +171,205 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	public void deleteFromDatabase(int id_player, int id_friend){
-		
+
+	public void deleteFromDatabase(int id_player, int id_friend) {
+
 		Statement statement;
 
 		try {
 
 			statement = connection.createStatement();
 
-			statement.executeUpdate("DELETE FROM Friend WHERE id_player = " + id_player + " AND id_friend = " + id_friend + ";");
+			statement.executeUpdate(
+					"DELETE FROM Friend WHERE id_player = " + id_player + " AND id_friend = " + id_friend + ";");
 
 			System.out.println("Deleted friend sucessfully!");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	public void addFriend(int id_player, int id_friend){
-		
+
+	public void addFriend(int id_player, int id_friend) {
+
 		Statement statement;
 
 		try {
 
 			statement = connection.createStatement();
 
-			statement.executeUpdate("INSERT INTO Friend (id_player, id_friend) VALUES (" + id_player + "," + id_friend + ");");
+			statement.executeUpdate(
+					"INSERT INTO Friend (id_player, id_friend) VALUES (" + id_player + "," + id_friend + ");");
 
 			System.out.println("Added friend successfully!");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	public void addPlayer(Player player){
-		
+
+	public void addPlayer(Player player) {
+
 		Statement statement;
 
 		try {
 
 			statement = connection.createStatement();
 
-			statement.executeUpdate("INSERT INTO Player (id, username, password, name, email, age, country) VALUES (" 
-			+ player.getId() + ",'" + player.getUsername() + "','" + player.getPassword() + "','" 
-					+ player.getName() + "','" + player.getEmail() + "',"
-					+ player.getAge() + ",'" + player.getCountry() + "');");
+			statement.executeUpdate(
+					"INSERT INTO Player (id, username, password, name, email, age, country) VALUES (" + player.getId()
+							+ ",'" + player.getUsername() + "','" + player.getPassword() + "','" + player.getName()
+							+ "','" + player.getEmail() + "'," + player.getAge() + ",'" + player.getCountry() + "');");
 
 			System.out.println("Added player successfully!");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		
+
 	}
-	
+
 	/**
 	 * Verifies the player data - username and password
+	 * 
 	 * @param username
 	 * @param password
 	 * @return boolean
 	 */
-	public Boolean playerVerification(String username, String password){
-		
+	public Boolean playerVerification(String username, String password) {
+
 		Statement username_statement;
 		Statement password_statement;
-		
-		try{
-			
+
+		try {
+
 			username_statement = connection.createStatement();
-			
-			ResultSet username_result = username_statement.executeQuery("SELECT username FROM player WHERE username = '" + username + "';");
-			
-			if(!username_result.next()){
+
+			ResultSet username_result = username_statement
+					.executeQuery("SELECT username FROM player WHERE username = '" + username + "';");
+
+			if (!username_result.next()) {
 				System.out.println("ResultSet empty! No players registered with that username!");
 				return false;
-			}else{
-				
+			} else {
+
 				password_statement = connection.createStatement();
-				
-				ResultSet password_result = password_statement.executeQuery("SELECT password FROM player WHERE password = '" + password + "';");
-				
-				if(!password_result.next()){
+
+				ResultSet password_result = password_statement
+						.executeQuery("SELECT password FROM player WHERE password = '" + password + "';");
+
+				if (!password_result.next()) {
 					System.out.println("Wrong password!");
 					return false;
-				}else
+				} else
 					return true;
-				
+
 			}
-			
-		}catch(SQLException e){
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
-		
+
+	}
+
+	public Boolean editPlayerPassword(String username, String new_password) {
+
+		Statement edit;
+
+		try {
+
+			edit = connection.createStatement();
+
+			edit.executeUpdate("UPDATE player SET password='" + new_password + "' WHERE username='" + username + "';");
+
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	public Boolean editPlayerName(String username, String new_name) {
+
+		Statement edit;
+
+		try {
+
+			edit = connection.createStatement();
+
+			edit.executeUpdate("UPDATE player SET name='" + new_name + "' WHERE username='" + username + "';");
+
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	public Boolean editPlayerEmail(String username, String new_email) {
+
+		Statement edit;
+
+		try {
+
+			edit = connection.createStatement();
+
+			edit.executeUpdate("UPDATE player SET email='" + new_email + "' WHERE username='" + username + "';");
+
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	public Boolean editPlayerAge(String username, String new_age) {
+
+		Statement edit;
+
+		try {
+
+			edit = connection.createStatement();
+
+			edit.executeUpdate("UPDATE player SET age=" + Integer.parseInt(new_age) + " WHERE username='" + username + "';");
+
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	public Boolean editPlayerCountry(String username, String new_country) {
+
+		Statement edit;
+
+		try {
+
+			edit = connection.createStatement();
+
+			edit.executeUpdate("UPDATE player SET country='" + new_country + "' WHERE username='" + username + "';");
+
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
 	}
 
 }

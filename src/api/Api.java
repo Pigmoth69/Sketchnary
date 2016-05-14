@@ -15,13 +15,13 @@ import com.sun.net.httpserver.HttpHandler;
 import connection.Database;
 
 public class Api implements HttpHandler {
-	
+
 	private Database database;
 
-	public Api(Database database){
+	public Api(Database database) {
 		this.database = database;
 	}
-	
+
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
 
@@ -60,6 +60,7 @@ public class Api implements HttpHandler {
 
 	/**
 	 * Process all types of events
+	 * 
 	 * @param exchange
 	 * @param method
 	 * @param body
@@ -68,47 +69,163 @@ public class Api implements HttpHandler {
 	 */
 	private void processEvent(HttpExchange exchange, String method, String body, String[] paths,
 			Map<String, String> filtered) {
-		
+
 		String username = filtered.get("username");
-		String password = filtered.get("password");
+		String password = null;	
+		String name = null;
+		String email = null;
+		String age = null;
+		String country = null;
 		
-		if(username == null)
-			response(exchange, "Null Username!");
-		if(password == null)
-			response(exchange, "Null Password!");
-		
-		switch(method){
-		
+		if(filtered.containsKey("password"))
+			password = filtered.get("password");
+		if(filtered.containsKey("name"))
+			name = filtered.get("name");
+		if(filtered.containsKey("email"))
+			email = filtered.get("email");
+		if(filtered.containsKey("age"))
+			age = filtered.get("age");
+		if(filtered.containsKey("country"))
+			country = filtered.get("country");
+
+		switch (method) {
+
 		case "GET":
+			if (username == null)
+				response(exchange, "Null Username!");
+			if (password == null)
+				response(exchange, "Null Password!");
+			
 			handleGET(exchange, username, password);
 			break;
 		case "POST":
-			//handlePOST(exchange, username, password);
+			if (username == null)
+				response(exchange, "Null Username!");
+			
+			handlePOST(exchange, username, password, name, email, age, country);
 			break;
 		case "PUT":
-			//handlePUT();
+			if (username == null)
+				response(exchange, "Null Username!");
+			if (password == null)
+				response(exchange, "Null Password!");
+			if(name == null)
+				response(exchange, "Null Name!");
+			if(email == null)
+				response(exchange, "Null Email!");
+			if(age == null)
+				response(exchange, "Invalid Age!");
+			
+			handlePUT(exchange, username, password, name, email, age, country);
 			break;
 		case "DELETE":
-			//handleDELETE();
+			handleDELETE(exchange, username, password);
 			break;
 		default:
 			break;
-		
+
 		}
-		
+
 	}
 
+	/**
+	 * Handle a GET request
+	 * 
+	 * @param exchange
+	 * @param username
+	 * @param password
+	 */
 	private void handleGET(HttpExchange exchange, String username, String password) {
-	
+
 		User user = new User(database, username, password);
-		
+
 		int response_code = user.UserGET();
-		
-		if(response_code == 200)
+
+		if (response_code == 200)
 			response(exchange, "GET request successful!");
 		else
 			response(exchange, "Not Found!");
-		
+
+	}
+
+	/**
+	 * Handle a POST request
+	 * 
+	 * @param exchange
+	 * @param username
+	 * @param password
+	 * @param name
+	 * @param email
+	 * @param age
+	 * @param country
+	 */
+	private void handlePOST(HttpExchange exchange, String username, String password, String name, String email,
+			String age, String country) {
+
+		User user = new User(database, username, password);
+		if(name != null)
+			user.setName(name);
+		if(email != null)
+			user.setEmail(email);
+		if(age != null)
+			user.setAge(age);
+		if(country != null)
+			user.setCountry(country);
+
+		int response_code = user.UserPOST();
+
+		if (response_code == 200)
+			response(exchange, "POST request successful!");
+		else
+			response(exchange, "Not Found!");
+
+	}
+
+	/**
+	 * Handle a PUT request
+	 * 
+	 * @param exchange
+	 * @param username
+	 * @param password
+	 * @param name
+	 * @param email
+	 * @param age
+	 * @param country
+	 */
+	private void handlePUT(HttpExchange exchange, String username, String password, String name, String email,
+			String age, String country) {
+
+		User user = new User(database, username, password);
+		user.setName(name);
+		user.setEmail(email);
+		user.setAge(age);
+		user.setCountry(country);
+
+		int response_code = user.UserPUT();
+
+		if (response_code == 200)
+			response(exchange, "POST request successful!");
+		else
+			response(exchange, "Not Found!");
+
+	}
+
+	/**
+	 * Handle a DELETE request
+	 * 
+	 * @param username
+	 */
+	private void handleDELETE(HttpExchange exchange, String username, String password) {
+
+		User user = new User(database, username, password);
+
+		int response_code = user.UserDELETE();
+
+		if (response_code == 200)
+			response(exchange, "GET request successful!");
+		else
+			response(exchange, "Not Found!");
+
 	}
 
 	/**
@@ -140,15 +257,15 @@ public class Api implements HttpHandler {
 	}
 
 	private void response(HttpExchange exchange, String message) {
-		
+
 		try {
 			exchange.sendResponseHeaders(200, message.getBytes().length);
 		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
-		
+
 		OutputStream output = exchange.getResponseBody();
-		
+
 		try {
 			output.write(message.getBytes());
 			output.close();
@@ -178,5 +295,5 @@ public class Api implements HttpHandler {
 		return map;
 
 	}
-	
+
 }
