@@ -204,7 +204,7 @@ public class Api implements HttpHandler {
 		int response_code = user.UserPUT();
 
 		if (response_code == 200)
-			response(exchange, "POST request successful!");
+			response(exchange, "PUT request successful!");
 		else
 			response(exchange, "Not Found!");
 
@@ -222,7 +222,7 @@ public class Api implements HttpHandler {
 		int response_code = user.UserDELETE();
 
 		if (response_code == 200)
-			response(exchange, "GET request successful!");
+			response(exchange, "DELETE request successful!");
 		else
 			response(exchange, "Not Found!");
 

@@ -5,12 +5,13 @@ import connection.Database;
 public class User {
 	
 	private Database database;
+	
 	private String username;
-	private String password;
-	private String name;
-	private String email;
-	private String age;
-	private String country;
+	private String password = null;
+	private String name = null;
+	private String email = null;
+	private String age = null;
+	private String country = null;
 	
 	public User(Database database, String username, String password){
 		this.database = database;
@@ -54,6 +55,10 @@ public class User {
 		
 		Boolean controller = false;
 		
+		if(password != null){
+			database.editPlayerPassword(username, password);
+			controller = true;
+		}
 		if(name != null){
 			database.editPlayerName(username, name);
 			controller = true;
@@ -84,6 +89,8 @@ public class User {
 	 */
 	public int UserPUT(){
 		
+		if(database.createPlayer(username, password, name, email, age, country))
+			return 200;
 		return 404;
 		
 	}
@@ -94,6 +101,8 @@ public class User {
 	 */
 	public int UserDELETE(){
 		
+		if(database.deletePlayer(username))
+			return 200;
 		return 404;
 		
 	}

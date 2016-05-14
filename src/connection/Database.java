@@ -371,5 +371,45 @@ public class Database {
 		}
 
 	}
+	
+	public Boolean createPlayer(String username, String password, String name, String email, String age, String country){
+		
+		Statement edit;
+		
+		try{
+			
+			edit = connection.createStatement();
+			
+			edit.executeUpdate("INSERT INTO Player (username, password, name, email, age, country) VALUES ('" + username
+					+ "','" + password + "','" + name
+							+ "','" + email + "'," + Integer.parseInt(age) + ",'" + country + "');");
+			
+			return true;
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
+	
+	public Boolean deletePlayer(String username){
+		
+		Statement delete;
+		
+		try{
+			
+			delete = connection.createStatement();
+			
+			delete.executeUpdate("DELETE FROM player WHERE username = '" + username + "';");
+			
+			return true;
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
 
 }
