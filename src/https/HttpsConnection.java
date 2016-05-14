@@ -1,151 +1,66 @@
 package https;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.net.InetSocketAddress;
+import java.security.KeyStore;
 
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 
-public class HttpsConnection implements HttpHandler {
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsServer;
 
-	public HttpsConnection() {
+import api.Api;
+import connection.Database;
+
+public class HttpsConnection {
+	
+	private Database database;
+
+	public HttpsConnection(Database database) {
+		this.database = database;
 	}
 
-	@Override
-	public void handle(HttpExchange exchange) throws IOException {
-
-		String method = exchange.getRequestMethod();
-		URI uri = exchange.getRequestURI();
-
-		String[] paths = uri.getPath().replaceFirst("^/", "").split("/");
-		String query = uri.getQuery();
-
-		if (query == null)
-			query = "";
-
-		HashMap<String, String> filtered = filter(query);
-
+	private SSLContext createSSLContext() {
+		
+		SSLContext sslContext = null;
+		
 		try {
-			process(exchange, method, paths, filtered);
+			sslContext = SSLContext.getInstance("TLS");
+			char[] keystorePassword = "123456".toCharArray();
+			KeyStore ks = KeyStore.getInstance("JKS");
+
+			ks.load(new FileInputStream("keys/server.keys"), keystorePassword);
+
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+			kmf.init(ks, keystorePassword);
+			sslContext.init(kmf.getKeyManagers(), null, null);
+
 		} catch (Exception e) {
-			response(exchange, "Unknown error");
-		}
-
-	}
-
-	private void process(HttpExchange exchange, String method, String[] paths, HashMap<String, String> filtered) {
-
-		Headers headers = exchange.getRequestHeaders();
-		headers.add("Content-Type", "application/json");
-
-		String body = getBody(exchange);
-
-		if (paths[1].equals("event"))
-			processEvent(exchange, method, body, paths, filtered);
-		else
-			response(exchange, "Not an event.");
-
-	}
-
-	/**
-	 * Process all types of events
-	 * @param exchange
-	 * @param method
-	 * @param body
-	 * @param paths
-	 * @param filtered
-	 */
-	private void processEvent(HttpExchange exchange, String method, String body, String[] paths,
-			HashMap<String, String> filtered) {
-		
-		switch(method){
-		
-		case "GET":
-			break;
-		case "POST":
-			break;
-		case "PUT":
-			break;
-		case "DELETE":
-			break;
-		default:
-			break;
-		
-		}
-		
-	}
-
-	/**
-	 * Get the message's body
-	 * 
-	 * @param exchange
-	 * @return body
-	 */
-	private String getBody(HttpExchange exchange) {
-
-		String body;
-
-		InputStream input = exchange.getRequestBody();
-		Scanner scanner = new Scanner(input);
-
-		scanner.useDelimiter("\\");
-
-		body = scanner.hasNext() ? scanner.next() : "";
-
-		try {
-			scanner.close();
-			input.close();
-		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return body;
-
+		return sslContext;
 	}
 
-	private void response(HttpExchange exchange, String error) {
+	public void setup() {
+		
+		HttpsServer httpserver;
 		
 		try {
-			exchange.sendResponseHeaders(200, error.getBytes().length);
-		} catch (IOException error1) {
-			error1.printStackTrace();
-		}
-		
-		OutputStream output = exchange.getResponseBody();
-		
-		try {
-			output.write(error.getBytes());
-			output.close();
+			
+			httpserver = HttpsServer.create(new InetSocketAddress(443), 0);
+			httpserver.setHttpsConfigurator(new HttpsConfigurator(createSSLContext()));
+			
+			httpserver.createContext("/api", new Api(database));
+			httpserver.setExecutor(null);
+			httpserver.start();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	/**
-	 * Transform a string query into an hashmap
-	 * 
-	 * @param query
-	 * @return hashmap
-	 */
-	public HashMap<String, String> filter(String query) {
-
-		HashMap<String, String> map = new HashMap<String, String>();
-
-		for (String keyValue : query.split("&")) {
-
-			String[] pairs = keyValue.split("=");
-			map.put(pairs[0], pairs.length == 1 ? "" : pairs[1]);
-
-		}
-
-		return map;
-
+		
 	}
 
 }

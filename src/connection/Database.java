@@ -2,7 +2,6 @@ package connection;
 
 import server.Friend;
 import server.Player;
-import server.Server;
 import server.ServerData;
 
 import java.sql.Statement;
@@ -13,7 +12,6 @@ import java.sql.SQLException;
 
 public class Database {
 
-	private Server server;
 	private ServerData serverData;
 	private String host;
 	private String username;
@@ -21,8 +19,7 @@ public class Database {
 
 	private Connection connection;
 
-	public Database(Server server, ServerData serverData, String host, String username, String password) {
-		this.server = server;
+	public Database(ServerData serverData, String host, String username, String password) {
 		this.serverData = serverData;
 
 		this.host = host;
@@ -133,7 +130,7 @@ public class Database {
 			statement = connection.createStatement();
 
 			statement.executeUpdate("INSERT INTO friend (id_player, id_friend) " + "VALUES ("
-					+ friend.getIdPlayer() + ", " + friend.getIdFriend() + ")");
+					+ friend.getIdPlayer() + ", " + friend.getIdFriend() + ");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -147,7 +144,7 @@ public class Database {
 
 			statement = connection.createStatement();
 
-			ResultSet result = statement.executeQuery("SELECT name FROM player");
+			ResultSet result = statement.executeQuery("SELECT name FROM player;");
 
 			while (result.next()) {
 				System.out.println(result.getString("name"));
@@ -232,6 +229,47 @@ public class Database {
 			e.printStackTrace();
 		}
 		
+		
+	}
+	
+	/**
+	 * Verifies the player data - username and password
+	 * @param username
+	 * @param password
+	 * @return boolean
+	 */
+	public Boolean playerVerification(String username, String password){
+		
+		Statement username_statement;
+		Statement password_statement;
+		
+		try{
+			
+			username_statement = connection.createStatement();
+			
+			ResultSet username_result = username_statement.executeQuery("SELECT username FROM player WHERE username = '" + username + "';");
+			
+			if(!username_result.next()){
+				System.out.println("ResultSet empty! No players registered with that username!");
+				return false;
+			}else{
+				
+				password_statement = connection.createStatement();
+				
+				ResultSet password_result = password_statement.executeQuery("SELECT password FROM player WHERE password = '" + password + "';");
+				
+				if(!password_result.next()){
+					System.out.println("Wrong password!");
+					return false;
+				}else
+					return true;
+				
+			}
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			return false;
+		}
 		
 	}
 

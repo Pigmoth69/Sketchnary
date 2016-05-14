@@ -7,11 +7,10 @@ public class Server {
 	public Server(){}
 	
 	public static void main(String args[]){
-	
-		Server server = new Server();
+
 		ServerData serverData = new ServerData();
 		
-		Database database = new Database(server, serverData, "jdbc:postgresql://localhost:5432/sketchnary", "postgres", "database123");
+		Database database = new Database(serverData, "jdbc:postgresql://localhost:5432/sketchnary", "postgres", "database123");
 		
 		database.setup();
 		
