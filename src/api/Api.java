@@ -49,7 +49,7 @@ public class Api implements HttpHandler {
 		Headers headers = exchange.getRequestHeaders();
 		headers.add("Content-Type", "application/json");
 
-		String body = getBody(exchange);
+		String body = getBody(exchange); 
 
 		if (paths[1].equals("event"))
 			processEvent(exchange, method, body, paths, filtered);
@@ -127,6 +127,16 @@ public class Api implements HttpHandler {
 		}
 
 	}
+	
+	/*
+	 URL url = new URL("wwwsaksaksa");
+        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+        String inputLine;
+        StringBuilder builder = new StringBuilder();
+        while ((inputLine = in.readLine()) != null){
+            builder.append(inputLine);
+        }
+        String htmlCode = builder.toString();*/
 
 	/**
 	 * Handle a GET request
