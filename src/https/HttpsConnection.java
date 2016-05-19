@@ -15,7 +15,7 @@ import api.Api;
 import connection.Database;
 
 public class HttpsConnection {
-	
+
 	private Database database;
 
 	public HttpsConnection(Database database) {
@@ -23,9 +23,9 @@ public class HttpsConnection {
 	}
 
 	private SSLContext createSSLContext() {
-		
+
 		SSLContext sslContext = null;
-		
+
 		try {
 			sslContext = SSLContext.getInstance("TLS");
 			char[] keystorePassword = "123456".toCharArray();
@@ -45,22 +45,22 @@ public class HttpsConnection {
 	}
 
 	public void setup() {
-		
+
 		HttpsServer httpserver;
-		
+
 		try {
-			
+
 			httpserver = HttpsServer.create(new InetSocketAddress(443), 0);
 			httpserver.setHttpsConfigurator(new HttpsConfigurator(createSSLContext()));
-			
+
 			httpserver.createContext("/api", new Api(database));
 			httpserver.setExecutor(null);
 			httpserver.start();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }

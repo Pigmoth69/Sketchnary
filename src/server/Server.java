@@ -11,7 +11,7 @@ public class Server {
 
 		ServerData serverData = new ServerData();
 		
-		Database database = new Database(serverData, "jdbc:postgresql://localhost:5432/sketchnary", "postgres", "daniel55934837");
+		Database database = new Database(serverData, "jdbc:postgresql://localhost:5432/sketchnary", "postgres", "database123");
 		
 		database.setup();
 		
