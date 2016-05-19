@@ -1,4 +1,4 @@
-package connection;
+package tcpConnection;
 
 import java.io.*;
 import java.net.*;

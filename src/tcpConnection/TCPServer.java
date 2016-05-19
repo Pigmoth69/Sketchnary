@@ -1,4 +1,4 @@
-package connection;
+package tcpConnection;
 
 import java.io.*;
 import java.net.*;
@@ -62,7 +62,6 @@ class TCPServer
 	public String receive() throws IOException {
 
 		String clientSentence;
-		String capitalizedSentence;
 
 		connectionSocket = svSocket.accept();
 		

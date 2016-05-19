@@ -1,4 +1,4 @@
-package connection;
+package tcpConnection;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -16,6 +16,7 @@ public class Test {
 			type = scanner.nextLine();
 			System.out.print("mensagem a enviar: ");
 			message = scanner.nextLine();
+			scanner.close();
 		}
 		else{
 			type = args[0];
