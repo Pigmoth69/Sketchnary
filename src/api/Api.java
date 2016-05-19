@@ -24,7 +24,8 @@ public class Api implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
-
+		System.out.println("recebi!");
+		
 		String method = exchange.getRequestMethod();
 		URI uri = exchange.getRequestURI();
 
@@ -39,6 +40,8 @@ public class Api implements HttpHandler {
 		try {
 			process(exchange, method, paths, filtered);
 		} catch (Exception e) {
+			System.out.println("entrei no erro!");
+			e.printStackTrace();
 			response(exchange, "Unknown error");
 		}
 
@@ -46,7 +49,7 @@ public class Api implements HttpHandler {
 
 	private void process(HttpExchange exchange, String method, String[] paths, Map<String, String> filtered) {
 
-		Headers headers = exchange.getRequestHeaders();
+		Headers headers = exchange.getResponseHeaders();
 		headers.add("Content-Type", "application/json");
 
 		String body = getBody(exchange); 
@@ -69,7 +72,7 @@ public class Api implements HttpHandler {
 	 */
 	private void processEvent(HttpExchange exchange, String method, String body, String[] paths,
 			Map<String, String> filtered) {
-
+		System.out.println("processEvent");
 		String username = filtered.get("username");
 		String password = null;	
 		String name = null;
@@ -89,39 +92,43 @@ public class Api implements HttpHandler {
 			country = filtered.get("country");
 
 		switch (method) {
-
 		case "GET":
+			System.out.println("GET");
 			if (username == null)
 				response(exchange, "Null Username!");
-			if (password == null)
+			else if (password == null)
 				response(exchange, "Null Password!");
-			
-			handleGET(exchange, username, password);
+			else
+				handleGET(exchange, username, password);
 			break;
 		case "POST":
+			System.out.println("POST");
 			if (username == null)
 				response(exchange, "Null Username!");
-			
-			handlePOST(exchange, username, password, name, email, age, country);
+			else
+				handlePOST(exchange, username, password, name, email, age, country);
 			break;
 		case "PUT":
+			System.out.println("PUT");
 			if (username == null)
 				response(exchange, "Null Username!");
-			if (password == null)
+			else if (password == null)
 				response(exchange, "Null Password!");
-			if(name == null)
+			else if(name == null)
 				response(exchange, "Null Name!");
-			if(email == null)
+			else if(email == null)
 				response(exchange, "Null Email!");
-			if(age == null)
+			else if(age == null)
 				response(exchange, "Invalid Age!");
-			
-			handlePUT(exchange, username, password, name, email, age, country);
+			else
+				handlePUT(exchange, username, password, name, email, age, country);
 			break;
 		case "DELETE":
+			System.out.println("DELETE");
 			handleDELETE(exchange, username, password);
 			break;
 		default:
+			System.out.println("nenhum dos HTTP");
 			break;
 
 		}
@@ -251,7 +258,7 @@ public class Api implements HttpHandler {
 		InputStream input = exchange.getRequestBody();
 		Scanner scanner = new Scanner(input);
 
-		scanner.useDelimiter("\\");
+		scanner.useDelimiter("\\A");
 
 		body = scanner.hasNext() ? scanner.next() : "";
 

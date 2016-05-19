@@ -241,7 +241,6 @@ public class Database {
 	 * @return boolean
 	 */
 	public Boolean playerVerification(String username, String password) {
-
 		Statement username_statement;
 		Statement password_statement;
 
