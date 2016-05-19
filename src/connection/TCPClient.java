@@ -12,29 +12,29 @@ class TCPClient {
 	public TCPClient(String host, int port) throws Exception {
 		this.host = host;
 		this.port = port;
-		clientSocket = new Socket(host, port);
+		clientSocket = new Socket(host ,port);
 	}
 	
 	public String receive() throws UnknownHostException, IOException{
-		clientSocket = new Socket(this.host, this.port);
+		//clientSocket = new Socket(this.host, this.port);
 		
 		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		
 		String sentence = inFromServer.readLine();
 		
-		clientSocket.close();
+		//clientSocket.close();
 		
 		return sentence;
 	}
 	
 	public void send(String sentence) throws UnknownHostException, IOException{
-		clientSocket = new Socket(this.host, this.port);
+		//clientSocket = new Socket(this.host, this.port);
 		
 		DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 		
 		outToServer.writeBytes(sentence + '\n');
 		
-		clientSocket.close();
+		//clientSocket.close();
 	}
 
 	public Socket getClientSocket() {

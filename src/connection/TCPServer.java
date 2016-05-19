@@ -65,6 +65,7 @@ class TCPServer
 		String capitalizedSentence;
 
 		connectionSocket = svSocket.accept();
+		
 		BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
 		clientSentence = inFromClient.readLine();
@@ -72,12 +73,12 @@ class TCPServer
 		return clientSentence;
 	}
 	
-	public void Send(String sentence) throws IOException {
-		Socket connectionSocket = svSocket.accept();
+	public void send(String sentence) throws IOException {
+		//connectionSocket = svSocket.accept();
 		
-		DataOutputStream outToClient = new DataOutputStream(
-				connectionSocket.getOutputStream());
+		DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
 		
-		outToClient.writeBytes(sentence);
+		outToClient.writeBytes(sentence + '\n');
+		
 	}
 }
