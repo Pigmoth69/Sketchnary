@@ -240,20 +240,21 @@ public class Database {
 	 * @param password
 	 * @return boolean
 	 */
-	public Boolean playerVerification(String username, String password) {
-		Statement username_statement;
+	public String playerVerification(String email, String password) {
+		
+		Statement email_statement;
 		Statement password_statement;
 
 		try {
 
-			username_statement = connection.createStatement();
+			email_statement = connection.createStatement();
 
-			ResultSet username_result = username_statement
-					.executeQuery("SELECT username FROM player WHERE username = '" + username + "';");
+			ResultSet email_result = email_statement
+					.executeQuery("SELECT email FROM player WHERE email = '" + email + "';");
 
-			if (!username_result.next()) {
-				System.out.println("ResultSet empty! No players registered with that username!");
-				return false;
+			if (!email_result.next()) {
+				System.out.println("No players registered with that email!");
+				return "email";
 			} else {
 
 				password_statement = connection.createStatement();
@@ -263,20 +264,20 @@ public class Database {
 
 				if (!password_result.next()) {
 					System.out.println("Wrong password!");
-					return false;
+					return "password";
 				} else
-					return true;
+					return "true";
 
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
+			return "exception";
 		}
 
 	}
 
-	public Boolean editPlayerPassword(String username, String new_password) {
+	public Boolean editPlayerPassword(String email, String new_password) {
 
 		Statement edit;
 
@@ -284,7 +285,7 @@ public class Database {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("UPDATE player SET password='" + new_password + "' WHERE username='" + username + "';");
+			edit.executeUpdate("UPDATE player SET password='" + new_password + "' WHERE email='" + email + "';");
 
 			return true;
 
@@ -295,7 +296,7 @@ public class Database {
 
 	}
 
-	public Boolean editPlayerName(String username, String new_name) {
+	public Boolean editPlayerName(String email, String new_name) {
 
 		Statement edit;
 
@@ -303,26 +304,7 @@ public class Database {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("UPDATE player SET name='" + new_name + "' WHERE username='" + username + "';");
-
-			return true;
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-
-	}
-	
-	public Boolean editPlayerEmail(String username, String new_email) {
-
-		Statement edit;
-
-		try {
-
-			edit = connection.createStatement();
-
-			edit.executeUpdate("UPDATE player SET email='" + new_email + "' WHERE username='" + username + "';");
+			edit.executeUpdate("UPDATE player SET name='" + new_name + "' WHERE email='" + email + "';");
 
 			return true;
 
@@ -333,7 +315,7 @@ public class Database {
 
 	}
 	
-	public Boolean editPlayerAge(String username, String new_age) {
+	public Boolean editPlayerUsername(String email, String new_username) {
 
 		Statement edit;
 
@@ -341,7 +323,7 @@ public class Database {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("UPDATE player SET age=" + Integer.parseInt(new_age) + " WHERE username='" + username + "';");
+			edit.executeUpdate("UPDATE player SET username='" + new_username + "' WHERE email='" + email + "';");
 
 			return true;
 
@@ -352,7 +334,7 @@ public class Database {
 
 	}
 	
-	public Boolean editPlayerCountry(String username, String new_country) {
+	public Boolean editPlayerAge(String email, String new_age) {
 
 		Statement edit;
 
@@ -360,7 +342,26 @@ public class Database {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("UPDATE player SET country='" + new_country + "' WHERE username='" + username + "';");
+			edit.executeUpdate("UPDATE player SET age=" + Integer.parseInt(new_age) + " WHERE email='" + email + "';");
+
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	public Boolean editPlayerCountry(String email, String new_country) {
+
+		Statement edit;
+
+		try {
+
+			edit = connection.createStatement();
+
+			edit.executeUpdate("UPDATE player SET country='" + new_country + "' WHERE email='" + email + "';");
 
 			return true;
 
@@ -392,7 +393,7 @@ public class Database {
 		
 	}
 	
-	public Boolean deletePlayer(String username){
+	public Boolean deletePlayer(String email){
 		
 		Statement delete;
 		
@@ -400,7 +401,7 @@ public class Database {
 			
 			delete = connection.createStatement();
 			
-			delete.executeUpdate("DELETE FROM player WHERE username = '" + username + "';");
+			delete.executeUpdate("DELETE FROM player WHERE email = '" + email + "';");
 			
 			return true;
 			

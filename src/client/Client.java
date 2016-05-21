@@ -67,7 +67,7 @@ public class Client {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		Client client = new Client("https://172.30.24.106/api/event/?username=player1&password=pass", "GET");
+		Client client = new Client("https://172.30.24.106/api/event/?email=jon@gmail.com&password=pass", "GET");
 		client.setContext();
 
 		String urlParameters = "?username=player1&password=pass";
@@ -115,8 +115,6 @@ public class Client {
 		try {
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Content-Type", "api/event");
-			
-			
 			
 		} catch (ProtocolException e) {
 			// TODO Auto-generated catch block

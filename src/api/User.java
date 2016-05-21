@@ -6,16 +6,16 @@ public class User {
 	
 	private Database database;
 	
-	private String username;
+	private String email;
 	private String password = null;
 	private String name = null;
-	private String email = null;
+	private String username = null;
 	private String age = null;
 	private String country = null;
 	
-	public User(Database database, String username, String password){
+	public User(Database database, String email, String password){
 		this.database = database;
-		this.username = username;
+		this.email = email;
 		this.password = password;
 	}
 	
@@ -23,8 +23,8 @@ public class User {
 		this.name = name;
 	}
 	
-	public void setEmail(String email){
-		this.email = email;
+	public void setUsername(String username){
+		this.username = username;
 	}
 	
 	public void setAge(String age){
@@ -41,9 +41,16 @@ public class User {
 	 */
 	public int UserGET(){
 		
-		if(database.playerVerification(username, password))
-			return 200;
-		return 404;
+		String status = database.playerVerification(email, password);
+		
+		if(status.equals("email"))
+			return -1;
+		else if(status.equals("password"))
+			return -2;
+		else if(status.equals("true"))
+			return 2;
+		else
+			return 404;
 		
 	}
 	
@@ -56,23 +63,23 @@ public class User {
 		Boolean controller = false;
 		
 		if(password != null){
-			database.editPlayerPassword(username, password);
+			database.editPlayerPassword(email, password);
 			controller = true;
 		}
 		if(name != null){
-			database.editPlayerName(username, name);
+			database.editPlayerName(email, name);
 			controller = true;
 		}
 		if(email != null){
-			database.editPlayerEmail(username, email);
+			database.editPlayerUsername(email, username);
 			controller = true;
 		}
 		if(age != null){
-			database.editPlayerAge(username, age);
+			database.editPlayerAge(email, age);
 			controller = true;
 		}
 		if(country != null){
-			database.editPlayerCountry(username, country);
+			database.editPlayerCountry(email, country);
 			controller = true;
 		}
 		
@@ -101,7 +108,7 @@ public class User {
 	 */
 	public int UserDELETE(){
 		
-		if(database.deletePlayer(username))
+		if(database.deletePlayer(email))
 			return 200;
 		return 404;
 		

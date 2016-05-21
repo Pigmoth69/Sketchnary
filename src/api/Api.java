@@ -72,11 +72,12 @@ public class Api implements HttpHandler {
 	 */
 	private void processEvent(HttpExchange exchange, String method, String body, String[] paths,
 			Map<String, String> filtered) {
+		
 		System.out.println("processEvent");
-		String username = filtered.get("username");
+		String email = filtered.get("email");
 		String password = null;	
 		String name = null;
-		String email = null;
+		String username = null;
 		String age = null;
 		String country = null;
 		
@@ -84,8 +85,8 @@ public class Api implements HttpHandler {
 			password = filtered.get("password");
 		if(filtered.containsKey("name"))
 			name = filtered.get("name");
-		if(filtered.containsKey("email"))
-			email = filtered.get("email");
+		if(filtered.containsKey("username"))
+			username = filtered.get("username");
 		if(filtered.containsKey("age"))
 			age = filtered.get("age");
 		if(filtered.containsKey("country"))
@@ -94,12 +95,12 @@ public class Api implements HttpHandler {
 		switch (method) {
 		case "GET":
 			System.out.println("GET");
-			if (username == null)
-				response(exchange, "Null Username!");
+			if (email == null)
+				response(exchange, "Null Email!");
 			else if (password == null)
 				response(exchange, "Null Password!");
 			else
-				handleGET(exchange, username, password);
+				handleGET(exchange, email, password);
 			break;
 		case "POST":
 			System.out.println("POST");
@@ -152,16 +153,20 @@ public class Api implements HttpHandler {
 	 * @param username
 	 * @param password
 	 */
-	private void handleGET(HttpExchange exchange, String username, String password) {
+	private void handleGET(HttpExchange exchange, String email, String password) {
 
-		User user = new User(database, username, password);
+		User user = new User(database, email, password);
 
 		int response_code = user.UserGET();
 
-		if (response_code == 200)
-			response(exchange, "GET request successful!");
+		if (response_code == -1)
+			response(exchange, "Invalid email!");
+		else if(response_code == -2)
+			response(exchange, "Invalid password!");
+		else if(response_code == 2)
+			response(exchange, "Login successful!");
 		else
-			response(exchange, "Not Found!");
+			response(exchange, "Unknown error!");
 
 	}
 
@@ -179,11 +184,12 @@ public class Api implements HttpHandler {
 	private void handlePOST(HttpExchange exchange, String username, String password, String name, String email,
 			String age, String country) {
 
-		User user = new User(database, username, password);
+		User user = new User(database, email, password);
+		
 		if(name != null)
 			user.setName(name);
-		if(email != null)
-			user.setEmail(email);
+		if(username != null)
+			user.setUsername(username);
 		if(age != null)
 			user.setAge(age);
 		if(country != null)
@@ -212,9 +218,10 @@ public class Api implements HttpHandler {
 	private void handlePUT(HttpExchange exchange, String username, String password, String name, String email,
 			String age, String country) {
 
-		User user = new User(database, username, password);
+		User user = new User(database, email, password);
+		
 		user.setName(name);
-		user.setEmail(email);
+		user.setUsername(username);
 		user.setAge(age);
 		user.setCountry(country);
 
