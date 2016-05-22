@@ -9,21 +9,22 @@ public class BackupServer {
 	private Database database;
 	private ServerData serverData;
 
-	private int port;
+	private int port_c1;
+	private int port_c2;
 	
-	public BackupServer(Database database, ServerData serverData, int port){
+	public BackupServer(Database database, ServerData serverData, int port_c1, int port_c2){
 		this.database = database;
 		this.serverData = serverData;
 
-		this.port = port;
+		this.port_c1 = port_c1;
+		this.port_c2 = port_c2;
 	}
 	
 	public void manager(){
 		
 		try {
-			TCPServer backup_server = new TCPServer(port);
-			
-			backup_server.receive();
+			TCPServer backup_server_c1 = new TCPServer(port_c1);
+			TCPServer backup_server_c2 = new TCPServer(port_c2);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

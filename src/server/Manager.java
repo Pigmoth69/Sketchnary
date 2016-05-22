@@ -1,86 +1,57 @@
 package server;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import connection.Database;
+import tcpConnection.Channel;
 import tcpConnection.TCPClient;
+import utilities.Constants;
 
-public class Manager {
+public class Manager implements Runnable{
 	
 	private Database database;
 	private Server server;
 	private ServerData serverData;
 	private TCPClient tcpClient;
+	private Channel channel;
 	
 	private String hostname;
-	private int port;
+	private int port_c1;
+	private int port_c2;
 	private ArrayList<String> send_queue;
 	
-	public Manager(Database database, Server server, ServerData serverData, String hostname, int port){
+	public Manager(Database database, Server server, ServerData serverData, String hostname, int port_c1, int port_c2){
 		this.database = database;
 		this.server = server;
 		
 		this.hostname = hostname;
-		this.port = port;
+		this.port_c1 = port_c1;
+		this.port_c2 = port_c2;
 		this.send_queue = new ArrayList<String>();
+		
+		start();
 	}
 	
-	public Boolean updateBackupServer(ArrayList<String> queries){
+	public void start(){
+		new Thread(this).start();
 		
-		try {
-			tcpClient = new TCPClient(hostname, port);
-			
-			sendQueries(queries);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		
-		return null;
-		
+		channel = new Channel(hostname, port_c1, port_c2);
+		channel.createChannels(false);
 	}
-	
-	public int sendQueries(ArrayList<String> queries){
+
+	@Override
+	public void run() {
 		
-		for(int i = 0; i < queries.size(); i++){
+		while(true){
 			
-			try {
-				
-				tcpClient.send(queries.get(i));
-				
-				verifyIntegrity(queries.get(i));
-				
-			} catch (IOException e) {
-				e.printStackTrace();
+			for(int i = 0; i < send_queue.size(); i++){
+				if(channel.exchangeC1(false, send_queue.get(i)).equals(Constants.OK))
+					System.out.println("Sent successfully!");
+					
+					
 			}
 			
 		}
-		
-		return -1;
-		
-	}
-
-	/**
-	 * Verify whether the correct query was received
-	 * @param string
-	 * @return
-	 */
-	private Boolean verifyIntegrity(String string) {
-		
-		String received = null;
-		
-		try {
-			received = tcpClient.receive();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		if(received.equals(string))
-			return true;
-		
-		return false;
 		
 	}
 	

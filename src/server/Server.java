@@ -14,19 +14,21 @@ public class Server {
 	
 	private Boolean role;
 	private String hostname;
-	private int port;
+	private int port_c1;
+	private int port_c2;
 
-	public Server(Boolean role, String hostname, int port) {
+	public Server(Boolean role, String hostname, int port_c1, int port_c2) {
 		serverData = new ServerData();
 		
 		this.role = role;
 		this.hostname = hostname;
-		this.port = port;
+		this.port_c1 = port_c1;
+		this.port_c2 = port_c2;
 	}
 
 	public static void main(String args[]) {
 		
-		if(args.length != 3){
+		if(args.length != 4){
 			System.out.println("[ERROR] wrong number of arguments for server");
 			System.exit(0);
 		}
@@ -38,17 +40,17 @@ public class Server {
 		else
 			server_role = false;
 
-		Server server = new Server(server_role, args[1], Integer.parseInt(args[2]));
+		Server server = new Server(server_role, args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
 
 		server.setupDatabaseConnection();
 		
 		if(server.role){
-			server.manager = new Manager(server.database, server, server.serverData, server.hostname, server.port);
+			server.manager = new Manager(server.database, server, server.serverData, server.hostname, server.port_c1, server.port_c2);
 			
 			server.setupHttpsConnection();
 		}
 		else
-			server.backupServer = new BackupServer(server.database, server.serverData, server.port);
+			server.backupServer = new BackupServer(server.database, server.serverData, server.port_c1, server.port_c2);
 
 	}
 
