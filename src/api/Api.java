@@ -24,7 +24,8 @@ public class Api implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
-		System.out.println("recebi!");
+		
+		System.out.println("[HANDLER] Detected an https request");
 		
 		String method = exchange.getRequestMethod();
 		URI uri = exchange.getRequestURI();
@@ -40,9 +41,8 @@ public class Api implements HttpHandler {
 		try {
 			process(exchange, method, paths, filtered);
 		} catch (Exception e) {
-			System.out.println("entrei no erro!");
 			e.printStackTrace();
-			response(exchange, "Unknown error");
+			response(exchange, "[ERROR] Unknown error");
 		}
 
 	}
@@ -57,7 +57,7 @@ public class Api implements HttpHandler {
 		if (paths[1].equals("event"))
 			processEvent(exchange, method, body, paths, filtered);
 		else
-			response(exchange, "Not an event.");
+			response(exchange, "[EVENT] Not an event");
 
 	}
 
@@ -73,7 +73,8 @@ public class Api implements HttpHandler {
 	private void processEvent(HttpExchange exchange, String method, String body, String[] paths,
 			Map<String, String> filtered) {
 		
-		System.out.println("processEvent");
+		System.out.println("[EVENT] Processing event");
+		
 		String email = filtered.get("email");
 		String password = null;	
 		String name = null;
@@ -94,7 +95,7 @@ public class Api implements HttpHandler {
 
 		switch (method) {
 		case "GET":
-			System.out.println("GET");
+			System.out.println("[EVENT] Processing GET request");
 			if (email == null)
 				response(exchange, "Invalid email!");
 			else if (password == null)
@@ -103,14 +104,14 @@ public class Api implements HttpHandler {
 				handleGET(exchange, email, password);
 			break;
 		case "POST":
-			System.out.println("POST");
+			System.out.println("[EVENT] Processing POST request");
 			if (username == null)
 				response(exchange, "Null Username!");
 			else
 				handlePOST(exchange, username, password, name, email, age, country);
 			break;
 		case "PUT":
-			System.out.println("PUT");
+			System.out.println("[EVENT] Processing PUT request");
 			if (username == null)
 				response(exchange, "Null Username!");
 			else if (password == null)
@@ -125,7 +126,7 @@ public class Api implements HttpHandler {
 				handlePUT(exchange, username, password, name, email, age, country);
 			break;
 		case "DELETE":
-			System.out.println("DELETE");
+			System.out.println("[EVENT] Processing DELETE request");
 			handleDELETE(exchange, username, password);
 			break;
 		default:
@@ -133,16 +134,6 @@ public class Api implements HttpHandler {
 			break;
 		}
 	}
-	
-	/*
-	 URL url = new URL("wwwsaksaksa");
-        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-        String inputLine;
-        StringBuilder builder = new StringBuilder();
-        while ((inputLine = in.readLine()) != null){
-            builder.append(inputLine);
-        }
-        String htmlCode = builder.toString();*/
 
 	/**
 	 * Handle a GET request

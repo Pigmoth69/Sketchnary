@@ -3,8 +3,8 @@ package tcpConnection;
 import java.io.*;
 import java.net.*;
 
-class TCPServer
-{
+public class TCPServer{
+	
 	ServerSocket svSocket;
 	Socket connectionSocket;
 	int port;

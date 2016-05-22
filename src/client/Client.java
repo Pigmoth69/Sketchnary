@@ -1,7 +1,6 @@
 package client;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,8 +28,7 @@ public class Client {
 	        {
 	            public boolean verify(String hostname, SSLSession session)
 	            {
-	                // ip address of the service URL(like.23.28.244.244)
-	                if (hostname.equals("172.30.24.106"))
+	                if (hostname.equals("192.168.1.113"))
 	                    return true;
 	                return false;
 	            }
@@ -67,10 +65,10 @@ public class Client {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		Client client = new Client("https://172.30.24.106/api/event/?email=jon@gmail.com&password=pass", "GET");
+		Client client = new Client("https://192.168.1.113/api/event/?email=jon@gmail.com&password=pass", "GET");
 		client.setContext();
 
-		String urlParameters = "?username=player1&password=pass";
+		String urlParameters = "?email=jon@gmail.com&password=pass";
 		
 		client.connection = null;
 		try {
@@ -117,7 +115,6 @@ public class Client {
 			connection.setRequestProperty("Content-Type", "api/event");
 			
 		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
