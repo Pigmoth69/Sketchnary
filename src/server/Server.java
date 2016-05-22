@@ -1,32 +1,70 @@
 package server;
 
+import backupServer.BackupServer;
 import connection.Database;
 import https.HttpsConnection;
 
 public class Server {
 	
-	public Server(){}
+	private Database database;
+	private ServerData serverData;
+	private BackupServer backupServer;
 	
-	public static void main(String args[]){
+	private Boolean role;
 
-		ServerData serverData = new ServerData();
+	public Server(Boolean role) {
+		serverData = new ServerData();
 		
-		Database database = new Database(serverData, "jdbc:postgresql://localhost:5432/sketchnary", "postgres", "database123");
+		this.role = role;
+	}
+
+	public static void main(String args[]) {
 		
+		if(args.length != 1){
+			System.out.println("[ERROR] wrong number of arguments for server");
+			System.exit(0);
+		}
+		
+		Boolean server_role;
+		
+		if(args[0].equals("main"))
+			server_role = true;
+		else
+			server_role = false;
+
+		Server server = new Server(server_role);
+
+		server.setupDatabaseConnection();
+		
+		if(server.role)
+			server.setupHttpsConnection();
+		else
+			server.backupServer = new BackupServer(server.database, server.serverData, "localhost", 445);
+
+	}
+
+	/**
+	 * Sets up the connection to the postgresql database
+	 * Gets the data from the database
+	 */
+	public void setupDatabaseConnection() {
+
+		database = new Database(serverData, "jdbc:postgresql://localhost:5432/sketchnary", "postgres",
+				"database123");
+
 		database.setup();
-		
 		database.recoverDatabase();
-		
-		/*for(int i = 0; i < serverData.getPlayers().size(); i++){
-			System.out.println("Player: " + serverData.getPlayers().get(i).getId() + " " + serverData.getPlayers().get(i).getName());
-			System.out.println("Friends: ");
-			for(int k = 0; k < serverData.getPlayers().get(i).getFriends().size(); k++){
-				System.out.println(serverData.getPlayers().get(i).getFriends().get(k).getName());
-			}
-		}*/
-		HttpsConnection c = new HttpsConnection(database);
-		c.setup();
-				
+
 	}
 	
+	/**
+	 * Sets up the https connection
+	 */
+	public void setupHttpsConnection(){
+		
+		HttpsConnection connection = new HttpsConnection(database);
+		connection.setup();
+		
+	}
+
 }
