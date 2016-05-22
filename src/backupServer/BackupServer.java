@@ -2,31 +2,28 @@ package backupServer;
 
 import connection.Database;
 import server.ServerData;
-import tcpConnection.TCPClient;
+import tcpConnection.TCPServer;
 
 public class BackupServer {
 	
 	private Database database;
 	private ServerData serverData;
-	
-	private String hostname;
+
 	private int port;
 	
-	public BackupServer(Database database, ServerData serverData, String hostname, int port){
+	public BackupServer(Database database, ServerData serverData, int port){
 		this.database = database;
 		this.serverData = serverData;
-		
-		this.hostname = hostname;
+
 		this.port = port;
 	}
 	
 	public void manager(){
 		
 		try {
-			TCPClient backup_client = new TCPClient(hostname, port);
+			TCPServer backup_server = new TCPServer(port);
 			
-			backup_client.receive();
-			
+			backup_server.receive();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
