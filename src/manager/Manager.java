@@ -23,11 +23,13 @@ public class Manager implements Runnable {
 		this.port_c2 = port_c2;
 		this.send_queue = new ArrayList<String>();
 
-		start();
+	}
+	
+	public void addToQueue(String query){
+		send_queue.add(query);
 	}
 
 	public void start() {
-		new Thread(this).start();
 
 		channel = new Channel(hostname, port_c1, port_c2);
 		System.out.println("[MANAGER] starting");
@@ -35,6 +37,9 @@ public class Manager implements Runnable {
 
 		failureHandler = new FailureHandler(channel);
 		managerAssistant = new ManagerAssistant(channel, failureHandler);
+		
+		new Thread(this).start();
+		
 	}
 
 	@Override
@@ -47,12 +52,12 @@ public class Manager implements Runnable {
 		while (true) {
 
 			if (send_queue.size() == 0) {
-				managerAssistant.freezeManager();
-				failureHandler.freezeHandler();
+				//managerAssistant.freezeManager();
+				//failureHandler.freezeHandler();
 			} else {
 				
-				managerAssistant.defrostManager();
-				failureHandler.defrostHandler();
+				//managerAssistant.defrostManager();
+				//failureHandler.defrostHandler();
 
 				for (int i = 0; i < send_queue.size(); i++) {
 

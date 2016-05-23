@@ -5,6 +5,9 @@ import server.Player;
 import server.ServerData;
 
 import java.sql.Statement;
+
+import manager.Manager;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -13,13 +16,17 @@ import java.sql.SQLException;
 public class Database {
 
 	private ServerData serverData;
+	private DatabaseTracker databaseTracker;
+
 	private String host;
 	private String username;
 	private String password;
 
 	private Connection connection;
 
-	public Database(ServerData serverData, String host, String username, String password) {
+	public Database(ServerData serverData, Manager manager, String host, String username, String password) {
+		this.databaseTracker = new DatabaseTracker(manager);
+
 		this.serverData = serverData;
 		this.host = host;
 		this.username = username;
@@ -30,6 +37,7 @@ public class Database {
 
 	public void setup() {
 		setConnection();
+		databaseTracker.start();
 	}
 
 	private void setConnection() {
@@ -214,15 +222,19 @@ public class Database {
 	public void addPlayer(Player player) {
 
 		Statement statement;
+		String query;
+
+		query = "INSERT INTO Player (id, username, password, name, email, age, country) VALUES (" + player.getId()
+				+ ",'" + player.getUsername() + "','" + player.getPassword() + "','" + player.getName() + "','"
+				+ player.getEmail() + "'," + player.getAge() + ",'" + player.getCountry() + "');";
 
 		try {
 
 			statement = connection.createStatement();
 
-			statement.executeUpdate(
-					"INSERT INTO Player (id, username, password, name, email, age, country) VALUES (" + player.getId()
-							+ ",'" + player.getUsername() + "','" + player.getPassword() + "','" + player.getName()
-							+ "','" + player.getEmail() + "'," + player.getAge() + ",'" + player.getCountry() + "');");
+			statement.executeUpdate(query);
+
+			databaseTracker.addQuery(query);
 
 			System.out.println("[DATABASE] Added player successfully!");
 
@@ -240,7 +252,7 @@ public class Database {
 	 * @return boolean
 	 */
 	public String playerVerification(String email, String password) {
-		
+
 		Statement email_statement;
 		Statement password_statement;
 
@@ -313,7 +325,7 @@ public class Database {
 		}
 
 	}
-	
+
 	public Boolean editPlayerUsername(String email, String new_username) {
 
 		Statement edit;
@@ -332,7 +344,7 @@ public class Database {
 		}
 
 	}
-	
+
 	public Boolean editPlayerAge(String email, String new_age) {
 
 		Statement edit;
@@ -351,7 +363,7 @@ public class Database {
 		}
 
 	}
-	
+
 	public Boolean editPlayerCountry(String email, String new_country) {
 
 		Statement edit;
@@ -370,70 +382,65 @@ public class Database {
 		}
 
 	}
-	
-	public Boolean createPlayer(String username, String password, String name, String email, String age, String country){
-		
+
+	public Boolean createPlayer(String username, String password, String name, String email, String age,
+			String country) {
+
 		Statement edit;
-		
-		try{
-			
-			edit = connection.createStatement();
-			
-			edit.executeUpdate("INSERT INTO Player (username, password, name, email, age, country) VALUES ('" + username
-					+ "','" + password + "','" + name
-							+ "','" + email + "'," + Integer.parseInt(age) + ",'" + country + "');");
-			
-			return true;
-			
-		}catch(SQLException e){
-			e.printStackTrace();
-			return false;
-		}
-		
-	}
-	
-	public Boolean deletePlayer(String email){
-		
-		Statement delete;
-		
-		try{
-			
-			delete = connection.createStatement();
-			
-			delete.executeUpdate("DELETE FROM player WHERE email = '" + email + "';");
-			
-			return true;
-			
-		}catch(SQLException e){
-			e.printStackTrace();
-			return false;
-		}
-		
-	}
-	
-	public Boolean updateDatabase(String query){
-		Statement s;
-		
+
 		try {
-			
-			s = connection.createStatement();
-			
-			s.execute(query);
-			
+
+			edit = connection.createStatement();
+
+			edit.executeUpdate("INSERT INTO Player (username, password, name, email, age, country) VALUES ('" + username
+					+ "','" + password + "','" + name + "','" + email + "'," + Integer.parseInt(age) + ",'" + country
+					+ "');");
+
 			return true;
-			
+
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
-		
-		
-		
-		
+
+	}
+
+	public Boolean deletePlayer(String email) {
+
+		Statement delete;
+
+		try {
+
+			delete = connection.createStatement();
+
+			delete.executeUpdate("DELETE FROM player WHERE email = '" + email + "';");
+
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	public Boolean updateDatabase(String query) {
+
+		Statement s;
+
+		try {
+
+			s = connection.createStatement();
+
+			s.executeUpdate(query);
+
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
 	}
 
 }
-
-
-	

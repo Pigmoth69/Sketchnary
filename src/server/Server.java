@@ -29,44 +29,52 @@ public class Server {
 
 	public static void main(String args[]) {
 
-		if (args.length != 4) {
-			System.out.println("[ERROR] wrong number of arguments for server");
+		if (args.length != 5) {
+			System.out.println("[SERVER] [ERROR] wrong number of arguments for server");
 			System.exit(0);
 		}
 
-		Boolean server_role;
+		Boolean server_role = true;
 
 
 		if (args[0].equals("main"))
 			server_role = true;
-		else
+		else if (args[0].equals("backup"))
 			server_role = false;
+		else
+			System.exit(1);
 
 		Server server = new Server(server_role, args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
-
-		server.setupDatabaseConnection();
-
+		server.setupDatabaseConnection(args[4], "postgres", "database123");
 
 		if (server.role) {
-			//server.manager = new Manager(server.database, server, server.serverData, server.hostname, server.port_c1,
-					//server.port_c2);
+			//server.manager = new Manager(server.hostname, server.port_c1, server.port_c2);
+			//server.manager.start();
 
 			server.setupHttpsConnection();
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			Player player = new Player(3, "coolGuy", "3cool3", "francis", "francis@gmail.com", 18, "France");
+			server.database.addPlayer(player);
+			
 		} else {
-			server.backupServer = new BackupServer(server.database, server.serverData, server.port_c1, server.port_c2);
-
-			server.backupServer.manager();
+			server.backupServer = new BackupServer(server.database, server.port_c1, server.port_c2);
+			server.backupServer.start();
 		}
 
 	}
 
 	/**
-	 * Sets up the connection to the postgresql database Gets the data from the
-	 * database
+	 * Sets up the connection to the postgresql database 
+	 * Gets the data from the database
 	 */
-	public void setupDatabaseConnection() {
-		database = new Database(serverData, "jdbc:postgresql://localhost:5432/sketchnary", "postgres",
-				"database123");
+	public void setupDatabaseConnection(String database_name, String owner, String password) {
+		database = new Database(serverData, manager, "jdbc:postgresql://localhost:5432/" + database_name, owner, password);
 
 		database.setup();
 		database.recoverDatabase();

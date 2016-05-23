@@ -157,6 +157,8 @@ public class Channel {
 		else {
 			if(sendC1(server, query))
 				return Constants.OK;
+			else
+				return Constants.ERROR1;
 		}
 
 		return received;

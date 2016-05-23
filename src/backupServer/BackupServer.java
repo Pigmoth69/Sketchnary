@@ -1,27 +1,38 @@
 package backupServer;
 
 import connection.Database;
-import server.ServerData;
 import tcpConnection.Channel;
-import tcpConnection.TCPServer;
-import utilities.Constants;
 
-public class BackupServer {
+public class BackupServer implements Runnable {
 
 	private Database database;
-	private ServerData serverData;
 	private Channel channel;
+	private HandlerC1 handlerC1;
+	private HandlerC2 handlerC2;
 
 	private int port_c1;
 	private int port_c2;
 
-	public BackupServer(Database database, ServerData serverData, int port_c1,
+	public BackupServer(Database database, int port_c1,
 			int port_c2) {
 		this.database = database;
-		this.serverData = serverData;
 
 		this.port_c1 = port_c1;
 		this.port_c2 = port_c2;
+	}
+	
+	public void start(){
+		new Thread(this).start();
+	}
+	
+	@Override
+	public void run() {
+		
+		manager();
+		
+		handlerC1.start();
+		handlerC2.start();
+		
 	}
 
 	public void manager() {
@@ -31,7 +42,10 @@ public class BackupServer {
 			channel = new Channel(null, port_c1, port_c2);
 			channel.createChannels(true);
 			
-			while(true){}
+			handlerC1 = new HandlerC1(channel);
+			handlerC2 = new HandlerC2(database, channel);
+			
+			handlerC1.assignHandlerC2(handlerC2);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -39,36 +53,4 @@ public class BackupServer {
 
 	}
 
-	public String updateDatabase(String query) {
-		if (database.updateDatabase(query))
-			return Constants.BACKUP_DB;
-		else
-			return Constants.ERROR_BK_DB;
-	}
-
-	public String serverExchange(String query) {
-		if (channel.exchangeC1(true, query).equals(Constants.OK)) {
-			if (channel.exchangeC2(true, query).equals(Constants.OK)) {
-				return Constants.OK;
-			} else {
-				return Constants.ERROR2;
-			}
-		}
-		else {
-			return Constants.ERROR1;
-		}
-	}
-	
-	public void serverConnection(String query){
-		int tries = 3;
-		
-		if(serverExchange(query).equals(Constants.OK))
-				return;
-		else{
-			while(tries > 0 && !(serverExchange(query).equals(Constants.OK))){
-				serverExchange(query);
-				tries--;
-			}
-		}
-	}
 }
