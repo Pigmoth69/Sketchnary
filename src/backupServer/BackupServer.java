@@ -27,8 +27,12 @@ public class BackupServer {
 	public void manager() {
 
 		try {
+
 			channel = new Channel(null, port_c1, port_c2);
 			channel.createChannels(true);
+			
+			while(true){}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

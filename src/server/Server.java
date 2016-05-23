@@ -3,6 +3,7 @@ package server;
 import backupServer.BackupServer;
 import connection.Database;
 import https.HttpsConnection;
+import manager.Manager;
 
 public class Server {
 
@@ -28,14 +29,15 @@ public class Server {
 
 	public static void main(String args[]) {
 
-		if(args.length != 4){
+		if (args.length != 4) {
 			System.out.println("[ERROR] wrong number of arguments for server");
 			System.exit(0);
 		}
 
 		Boolean server_role;
 
-		if(args[0].equals("main"))
+
+		if (args[0].equals("main"))
 			server_role = true;
 		else
 			server_role = false;
@@ -44,19 +46,23 @@ public class Server {
 
 		server.setupDatabaseConnection();
 
-		if(server.role){
-			server.manager = new Manager(server.database, server, server.serverData, server.hostname, server.port_c1, server.port_c2);
+
+		if (server.role) {
+			//server.manager = new Manager(server.database, server, server.serverData, server.hostname, server.port_c1,
+					//server.port_c2);
 
 			server.setupHttpsConnection();
-		}
-		else
+		} else {
 			server.backupServer = new BackupServer(server.database, server.serverData, server.port_c1, server.port_c2);
+
+			server.backupServer.manager();
+		}
 
 	}
 
 	/**
-	 * Sets up the connection to the postgresql database
-	 * Gets the data from the database
+	 * Sets up the connection to the postgresql database Gets the data from the
+	 * database
 	 */
 	public void setupDatabaseConnection() {
 		database = new Database(serverData, "jdbc:postgresql://localhost:5432/sketchnary", "postgres",

@@ -14,6 +14,8 @@ public class DatabaseTracker implements Runnable{
 		this.loop = 0;
 		
 		this.queries = new ArrayList<String>();
+		
+		new Thread(this).start();
 	}
 
 	@Override
