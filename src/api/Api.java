@@ -35,7 +35,7 @@ public class Api implements HttpHandler {
 
 		if (query == null)
 			query = "";
-
+				
 		Map<String, String> filtered = filter(query);
 
 		try {
@@ -97,9 +97,9 @@ public class Api implements HttpHandler {
 		case "GET":
 			System.out.println("[EVENT] Processing GET request");
 			if (email == null)
-				response(exchange, "Null Email!");
+				response(exchange, "Invalid email!");
 			else if (password == null)
-				response(exchange, "Null Password!");
+				response(exchange, "Invalid password!");
 			else
 				handleGET(exchange, email, password);
 			break;
@@ -132,9 +132,7 @@ public class Api implements HttpHandler {
 		default:
 			System.out.println("nenhum dos HTTP");
 			break;
-
 		}
-
 	}
 
 	/**
@@ -306,7 +304,6 @@ public class Api implements HttpHandler {
 			map.put(pairs[0], pairs.length == 1 ? "" : pairs[1]);
 
 		}
-
 		return map;
 
 	}

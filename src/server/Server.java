@@ -36,6 +36,7 @@ public class Server {
 
 		Boolean server_role;
 
+
 		if (args[0].equals("main"))
 			server_role = true;
 		else
@@ -44,6 +45,7 @@ public class Server {
 		Server server = new Server(server_role, args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
 
 		server.setupDatabaseConnection();
+
 
 		if (server.role) {
 			//server.manager = new Manager(server.database, server, server.serverData, server.hostname, server.port_c1,
@@ -74,7 +76,7 @@ public class Server {
 	/**
 	 * Sets up the https connection
 	 */
-	public void setupHttpsConnection() {
+	public void setupHttpsConnection(){
 
 		connection = new HttpsConnection(database);
 		connection.setup();
