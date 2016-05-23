@@ -55,16 +55,16 @@ public class Database {
 
 		} catch (SQLException e) {
 
-			System.out.println("Connection Failed! ");
+			System.out.println("[DATABASE] Connection Failed! ");
 			e.printStackTrace();
 			return;
 
 		}
 
 		if (connection != null) {
-			System.out.println("Connection successful!");
+			System.out.println("[DATABASE] Connection successful!");
 		} else {
-			System.out.println("Failed to make connection!");
+			System.out.println("[DATABASE] Failed to make connection!");
 		}
 
 	}
@@ -166,7 +166,7 @@ public class Database {
 
 			statement.executeUpdate("DELETE FROM Player WHERE id = " + id_player);
 
-			System.out.println("Deleted player successfully!");
+			System.out.println("[DATABASE] Deleted player successfully!");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -185,7 +185,7 @@ public class Database {
 			statement.executeUpdate(
 					"DELETE FROM Friend WHERE id_player = " + id_player + " AND id_friend = " + id_friend + ";");
 
-			System.out.println("Deleted friend sucessfully!");
+			System.out.println("[DATABASE] Deleted friend sucessfully!");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -204,7 +204,7 @@ public class Database {
 			statement.executeUpdate(
 					"INSERT INTO Friend (id_player, id_friend) VALUES (" + id_player + "," + id_friend + ");");
 
-			System.out.println("Added friend successfully!");
+			System.out.println("[DATABASE] Added friend successfully!");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -225,7 +225,7 @@ public class Database {
 							+ ",'" + player.getUsername() + "','" + player.getPassword() + "','" + player.getName()
 							+ "','" + player.getEmail() + "'," + player.getAge() + ",'" + player.getCountry() + "');");
 
-			System.out.println("Added player successfully!");
+			System.out.println("[DATABASE] Added player successfully!");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -253,7 +253,7 @@ public class Database {
 					.executeQuery("SELECT email FROM player WHERE email = '" + email + "';");
 
 			if (!email_result.next()) {
-				System.out.println("No players registered with that email!");
+				System.out.println("[DATABASE] No players registered with that email!");
 				return "email";
 			} else {
 
@@ -263,7 +263,7 @@ public class Database {
 						.executeQuery("SELECT password FROM player WHERE password = '" + password + "';");
 
 				if (!password_result.next()) {
-					System.out.println("Wrong password!");
+					System.out.println("[DATABASE] Wrong password!");
 					return "password";
 				} else
 					return "true";

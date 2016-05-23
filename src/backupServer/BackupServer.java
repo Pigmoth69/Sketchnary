@@ -26,6 +26,8 @@ public class BackupServer {
 			TCPServer backup_server_c1 = new TCPServer(port_c1);
 			TCPServer backup_server_c2 = new TCPServer(port_c2);
 			
+			while(true){}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
