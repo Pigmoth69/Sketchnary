@@ -65,7 +65,7 @@ public class BackupServer {
 		if(serverExchange(query).equals(Constants.OK))
 				return;
 		else{
-			while(tries > 0){
+			while(tries > 0 && !(serverExchange(query).equals(Constants.OK))){
 				serverExchange(query);
 				tries--;
 			}
