@@ -21,7 +21,6 @@ public class Database {
 
 	public Database(ServerData serverData, String host, String username, String password) {
 		this.serverData = serverData;
-
 		this.host = host;
 		this.username = username;
 		this.password = password;
@@ -411,5 +410,30 @@ public class Database {
 		}
 		
 	}
+	
+	public Boolean updateDatabase(String query){
+		Statement s;
+		
+		try {
+			
+			s = connection.createStatement();
+			
+			s.execute(query);
+			
+			return true;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		
+		
+		
+		
+	}
 
 }
+
+
+	

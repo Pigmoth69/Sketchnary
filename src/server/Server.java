@@ -59,7 +59,6 @@ public class Server {
 	 * Gets the data from the database
 	 */
 	public void setupDatabaseConnection() {
-
 		database = new Database(serverData, "jdbc:postgresql://localhost:5432/sketchnary", "postgres",
 				"database123");
 
