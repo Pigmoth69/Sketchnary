@@ -39,13 +39,15 @@ public class BackupServer implements Runnable {
 
 		try {
 
-			channel = new Channel(null, port_c1, port_c2);
-			channel.createChannels(true);
+			channel = new Channel(null, port_c1, port_c2, true);
+			channel.createChannels();
 			
 			handlerC1 = new HandlerC1(channel);
 			handlerC2 = new HandlerC2(database, channel);
 			
 			handlerC1.assignHandlerC2(handlerC2);
+			
+			System.out.println("[BACKUP SERVER] Created channels and called handlers");
 			
 		} catch (Exception e) {
 			e.printStackTrace();

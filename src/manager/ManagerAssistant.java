@@ -26,7 +26,7 @@ public class ManagerAssistant implements Runnable {
 	}
 	
 	public void start(){
-		
+		System.out.println("[MANAGER ASSISTANT] loading");
 		new Thread(this).start();
 		
 	}
@@ -38,26 +38,25 @@ public class ManagerAssistant implements Runnable {
 		
 		while(true){
 			
-			for(int i = 0; i < confirmation_queue.size(); i++){
-				
-				exchange_status = channel.exchangeC2(false, confirmation_queue.get(i));
-				if(exchange_status.equals(Constants.OK)){
-					System.out.println("[MANAGER ASSISTANT] Confirmed a query | [STATUS] Code " + exchange_status);
-					confirmation_queue.remove(i);
-				}else{
-					System.out.println("[MANAGER ASSISTANT] Confirmation failed | [STATUS] Code " + exchange_status);
-					handler.addFailedQuery(confirmation_queue.get(i));
-					confirmation_queue.remove(i);
-				}
-				
-			}
-		
 			try {
 				Thread.sleep(400);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
+			for(int i = 0; i < confirmation_queue.size(); i++){
+				
+				exchange_status = channel.exchangeC2(confirmation_queue.get(i));
+				if(exchange_status.equals(Constants.OK)){
+					System.out.println("[MANAGER ASSISTANT] Confirmed a query | [STATUS] " + exchange_status);
+					confirmation_queue.remove(i);
+				}else{
+					System.out.println("[MANAGER ASSISTANT] Confirmation failed | [STATUS] " + exchange_status);
+					handler.addFailedQuery(confirmation_queue.get(i));
+					confirmation_queue.remove(i);
+				}
+				
+			}
 		}
 		
 	}

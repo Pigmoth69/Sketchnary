@@ -14,6 +14,14 @@ public class TCPServer{
 		this.port = port;
 	}
 	
+	public void acceptSocket(){
+		try {
+			connectionSocket = svSocket.accept();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public ServerSocket getSvSocket() {
 		return svSocket;
 	}
@@ -62,8 +70,6 @@ public class TCPServer{
 	public String receive() throws IOException {
 
 		String clientSentence;
-
-		connectionSocket = svSocket.accept();
 		
 		BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
@@ -73,7 +79,6 @@ public class TCPServer{
 	}
 	
 	public void send(String sentence) throws IOException {
-		//connectionSocket = svSocket.accept();
 		
 		DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
 		

@@ -30,9 +30,9 @@ public class HandlerC1 implements Runnable {
 		while(true){
 			exchange_status = handleExchange();
 			if(exchange_status.equals(Constants.ERROR_BK_EX1))
-				System.out.println("[BACKUP SERVER] [HANDLER C1] Error in exchange 1 | Code " + Constants.ERROR_BK_EX1);
+				System.out.println("[BACKUP SERVER] [HANDLER C1] Error in exchange 1 | [STATUS] " + Constants.ERROR_BK_EX1);
 			else
-				System.out.println("[BACKUP SERVER] [HANDLER C1] Received a query");
+				System.out.println("[BACKUP SERVER] [HANDLER C1] Received a query [STATUS] " + Constants.OK);
 		}
 		
 	}
@@ -41,7 +41,7 @@ public class HandlerC1 implements Runnable {
 		
 		String received;
 		
-		received = channel.exchangeC1(true, null);
+		received = channel.exchangeC1(null);
 		
 		if(received.equals(Constants.OK) || received == null)
 			return Constants.ERROR_BK_EX1;

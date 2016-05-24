@@ -24,8 +24,8 @@ public class Database {
 
 	private Connection connection;
 
-	public Database(ServerData serverData, Manager manager, String host, String username, String password) {
-		this.databaseTracker = new DatabaseTracker(manager);
+	public Database(ServerData serverData, String host, String username, String password) {
+		this.databaseTracker = new DatabaseTracker();
 
 		this.serverData = serverData;
 		this.host = host;
@@ -37,6 +37,10 @@ public class Database {
 
 	public void setup() {
 		setConnection();
+	}
+	
+	public void setupTracker(Manager manager){
+		databaseTracker.setManager(manager);
 		databaseTracker.start();
 	}
 

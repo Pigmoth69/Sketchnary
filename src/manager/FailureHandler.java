@@ -25,6 +25,7 @@ public class FailureHandler implements Runnable {
 	}
 
 	public void start() {
+		System.out.println("[MANAGER HANDLER] loading");
 		new Thread(this).start();
 	}
 
@@ -35,10 +36,16 @@ public class FailureHandler implements Runnable {
 		int tries = 0;
 
 		while (true) {
+			
+			try {
+				Thread.sleep(400);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 
 			for (int i = 0; i < failed_sends.size(); i++) {
 
-				while (!resend_status.equals(Constants.OK) && tries < 3) {
+				while (resend_status != null && !resend_status.equals(Constants.OK) && tries < 3) {
 					resend_status = resendQuery(failed_sends.get(i));
 					tries++;
 				}
@@ -87,7 +94,7 @@ public class FailureHandler implements Runnable {
 	 */
 	public String resendC1(String query) {
 
-		String exchange_status = channel.exchangeC1(false, query);
+		String exchange_status = channel.exchangeC1(query);
 
 		if (exchange_status.equals(Constants.OK)) {
 			System.out.println("[MANAGER HANDLER] Dispatched a query | [STATUS] Code " + exchange_status);
@@ -107,7 +114,7 @@ public class FailureHandler implements Runnable {
 	 */
 	private String resendC2(String query) {
 
-		String exchange_status = channel.exchangeC2(false, query);
+		String exchange_status = channel.exchangeC2(query);
 
 		if (exchange_status.equals(Constants.OK)) {
 			System.out.println("[MANAGER HANDLER] Dispatched a query | [STATUS] Code " + exchange_status);

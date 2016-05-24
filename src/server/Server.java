@@ -48,9 +48,12 @@ public class Server {
 		server.setupDatabaseConnection(args[4], "postgres", "database123");
 
 		if (server.role) {
-			//server.manager = new Manager(server.hostname, server.port_c1, server.port_c2);
-			//server.manager.start();
 
+			server.manager = new Manager(server.hostname, server.port_c1, server.port_c2);
+			server.manager.start();
+			
+			server.database.setupTracker(server.manager);
+			
 			server.setupHttpsConnection();
 			
 			try {
@@ -74,7 +77,7 @@ public class Server {
 	 * Gets the data from the database
 	 */
 	public void setupDatabaseConnection(String database_name, String owner, String password) {
-		database = new Database(serverData, manager, "jdbc:postgresql://localhost:5432/" + database_name, owner, password);
+		database = new Database(serverData, "jdbc:postgresql://localhost:5432/" + database_name, owner, password);
 
 		database.setup();
 		database.recoverDatabase();
