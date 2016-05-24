@@ -32,6 +32,7 @@ public class HandlerC2 implements Runnable {
 	public void run() {
 
 		String exchange_status;
+		String database_status;
 
 		while (true) {
 			
@@ -47,8 +48,12 @@ public class HandlerC2 implements Runnable {
 				
 				if (exchange_status.equals(Constants.ERROR_BK_EX2))
 					System.out.println("[BACKUP SERVER] [HANDLER C2] Error in exchange 2 | [STATUS] " + Constants.ERROR_BK_EX2);
-				else
+				else{
 					System.out.println("[BACKUP SERVER] [HANDLER C2] Server replied [STATUS] " + exchange_status);
+					database_status = updateDatabase(received_queries.get(i));
+					if(database_status.equals(Constants.ERROR_BK_DB))
+						System.out.println("[BACKUP SERVER] [HANDLER C2] Database update failed | [STATUS] " + database_status);
+				}
 				
 				received_queries.remove(i);
 				
@@ -61,9 +66,7 @@ public class HandlerC2 implements Runnable {
 		
 		String exchange_status;
 
-		System.out.println("[BACKUP SERVER] [HANDLER C2] Loading exchange");
 		exchange_status = channel.exchangeC2(query);
-		System.out.println("[BACKUP SERVER] [HANDLER C2] Exchange finished");
 		
 		return exchange_status;
 	}

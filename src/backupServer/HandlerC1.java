@@ -25,9 +25,14 @@ public class HandlerC1 implements Runnable {
 		
 		String exchange_status;
 		
-		handlerC2.start();
-		
 		while(true){
+			
+			try {
+				Thread.sleep(400);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
 			exchange_status = handleExchange();
 			if(exchange_status.equals(Constants.ERROR_BK_EX1))
 				System.out.println("[BACKUP SERVER] [HANDLER C1] Error in exchange 1 | [STATUS] " + Constants.ERROR_BK_EX1);

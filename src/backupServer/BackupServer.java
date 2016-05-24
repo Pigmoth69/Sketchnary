@@ -47,7 +47,7 @@ public class BackupServer implements Runnable {
 			
 			handlerC1.assignHandlerC2(handlerC2);
 			
-			System.out.println("[BACKUP SERVER] Created channels and called handlers");
+			System.out.println("[BACKUP SERVER] Created channels");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
