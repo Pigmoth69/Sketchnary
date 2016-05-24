@@ -9,6 +9,7 @@ public class DatabaseTracker implements Runnable{
 	private Manager manager;
 	
 	private int loop;
+	private long initial_time;
 	private ArrayList<String> queries;
 	
 	public DatabaseTracker(){
@@ -33,6 +34,8 @@ public class DatabaseTracker implements Runnable{
 	public void run() {
 		
 		while(true){
+			
+			initial_time = System.nanoTime();
 			
 			try {
 				Thread.sleep(400);

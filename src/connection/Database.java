@@ -295,12 +295,17 @@ public class Database {
 	public Boolean editPlayerPassword(String email, String new_password) {
 
 		Statement edit;
+		String query;
+		
+		query = "UPDATE player SET password='" + new_password + "' WHERE email='" + email + "';";
 
 		try {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("UPDATE player SET password='" + new_password + "' WHERE email='" + email + "';");
+			edit.executeUpdate(query);
+			
+			databaseTracker.addQuery(query);
 
 			return true;
 
@@ -314,12 +319,17 @@ public class Database {
 	public Boolean editPlayerName(String email, String new_name) {
 
 		Statement edit;
+		String query;
+		
+		query = "UPDATE player SET name='" + new_name + "' WHERE email='" + email + "';";
 
 		try {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("UPDATE player SET name='" + new_name + "' WHERE email='" + email + "';");
+			edit.executeUpdate(query);
+			
+			databaseTracker.addQuery(query);
 
 			return true;
 
@@ -333,12 +343,17 @@ public class Database {
 	public Boolean editPlayerUsername(String email, String new_username) {
 
 		Statement edit;
+		String query;
+		
+		query = "UPDATE player SET username='" + new_username + "' WHERE email='" + email + "';";
 
 		try {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("UPDATE player SET username='" + new_username + "' WHERE email='" + email + "';");
+			edit.executeUpdate(query);
+			
+			databaseTracker.addQuery(query);
 
 			return true;
 
@@ -352,12 +367,17 @@ public class Database {
 	public Boolean editPlayerAge(String email, String new_age) {
 
 		Statement edit;
+		String query;
+		
+		query = "UPDATE player SET age=" + Integer.parseInt(new_age) + " WHERE email='" + email + "';";
 
 		try {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("UPDATE player SET age=" + Integer.parseInt(new_age) + " WHERE email='" + email + "';");
+			edit.executeUpdate(query);
+			
+			databaseTracker.addQuery(query);
 
 			return true;
 
@@ -371,12 +391,17 @@ public class Database {
 	public Boolean editPlayerCountry(String email, String new_country) {
 
 		Statement edit;
+		String query;
+		
+		query = "UPDATE player SET country='" + new_country + "' WHERE email='" + email + "';";
 
 		try {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("UPDATE player SET country='" + new_country + "' WHERE email='" + email + "';");
+			edit.executeUpdate(query);
+			
+			databaseTracker.addQuery(query);
 
 			return true;
 
@@ -391,14 +416,19 @@ public class Database {
 			String country) {
 
 		Statement edit;
+		String query;
+		
+		query = "INSERT INTO Player (username, password, name, email, age, country) VALUES ('" + username
+				+ "','" + password + "','" + name + "','" + email + "'," + Integer.parseInt(age) + ",'" + country
+				+ "');";
 
 		try {
 
 			edit = connection.createStatement();
 
-			edit.executeUpdate("INSERT INTO Player (username, password, name, email, age, country) VALUES ('" + username
-					+ "','" + password + "','" + name + "','" + email + "'," + Integer.parseInt(age) + ",'" + country
-					+ "');");
+			edit.executeUpdate(query);
+			
+			databaseTracker.addQuery(query);
 
 			return true;
 
@@ -412,12 +442,17 @@ public class Database {
 	public Boolean deletePlayer(String email) {
 
 		Statement delete;
+		String query;
+		
+		query = "DELETE FROM player WHERE email = '" + email + "';";
 
 		try {
 
 			delete = connection.createStatement();
 
-			delete.executeUpdate("DELETE FROM player WHERE email = '" + email + "';");
+			delete.executeUpdate(query);
+			
+			databaseTracker.addQuery(query);
 
 			return true;
 
