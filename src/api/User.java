@@ -10,7 +10,7 @@ public class User {
 	private String password = null;
 	private String name = null;
 	private String username = null;
-	private String age = null;
+	private String birthdate = null;
 	private String country = null;
 	
 	public User(Database database, String email, String password){
@@ -27,8 +27,8 @@ public class User {
 		this.username = username;
 	}
 	
-	public void setAge(String age){
-		this.age = age;
+	public void setBirthdate(String birthdate){
+		this.birthdate = birthdate;
 	}
 	
 	public void setCountry(String country){
@@ -74,8 +74,8 @@ public class User {
 			database.editPlayerUsername(email, username);
 			controller = true;
 		}
-		if(age != null){
-			database.editPlayerAge(email, age);
+		if(birthdate != null){
+			database.editPlayerBirthdate(email, birthdate);
 			controller = true;
 		}
 		if(country != null){
@@ -96,7 +96,7 @@ public class User {
 	 */
 	public int UserPUT(){
 		
-		if(database.createPlayer(username, password, name, email, age, country))
+		if(database.createPlayer(username, password, name, email, birthdate, country))
 			return 200;
 		return 404;
 		

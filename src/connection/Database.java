@@ -38,8 +38,8 @@ public class Database {
 	public void setup() {
 		setConnection();
 	}
-	
-	public void setupTracker(Manager manager){
+
+	public void setupTracker(Manager manager) {
 		databaseTracker.setManager(manager);
 		databaseTracker.start();
 	}
@@ -95,8 +95,8 @@ public class Database {
 			while (player.next()) {
 
 				Player pl = new Player(player.getInt("id"), player.getString("username"), player.getString("password"),
-						player.getString("name"), player.getString("email"), player.getInt("age"),
-						player.getString("country"));
+						player.getString("name"), player.getString("email"), player.getString("birthdate"),
+						player.getString("country"), player.getInt("points"));
 				serverData.addPlayer(pl);
 
 			}
@@ -125,9 +125,9 @@ public class Database {
 		try {
 			statement = connection.createStatement();
 
-			statement.executeUpdate("INSERT INTO player (username, password, name, email, age, country) " + "VALUES ('"
+			statement.executeUpdate("INSERT INTO player (username, password, name, email, birthdate, country) " + "VALUES ('"
 					+ player.getUsername() + "', '" + player.getPassword() + "', '" + player.getName() + "', '"
-					+ player.getEmail() + "', " + player.getAge() + ", '" + player.getCountry() + "')");
+					+ player.getEmail() + "', '" + player.getBirthdate() + "', '" + player.getCountry() + "')");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -228,9 +228,9 @@ public class Database {
 		Statement statement;
 		String query;
 
-		query = "INSERT INTO Player (id, username, password, name, email, age, country) VALUES (" + player.getId()
+		query = "INSERT INTO Player (id, username, password, name, email, birthdate, country) VALUES (" + player.getId()
 				+ ",'" + player.getUsername() + "','" + player.getPassword() + "','" + player.getName() + "','"
-				+ player.getEmail() + "'," + player.getAge() + ",'" + player.getCountry() + "');";
+				+ player.getEmail() + "'," + player.getBirthdate() + ",'" + player.getCountry() + "');";
 
 		try {
 
@@ -296,7 +296,7 @@ public class Database {
 
 		Statement edit;
 		String query;
-		
+
 		query = "UPDATE player SET password='" + new_password + "' WHERE email='" + email + "';";
 
 		try {
@@ -304,7 +304,7 @@ public class Database {
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-			
+
 			databaseTracker.addQuery(query);
 
 			return true;
@@ -320,7 +320,7 @@ public class Database {
 
 		Statement edit;
 		String query;
-		
+
 		query = "UPDATE player SET name='" + new_name + "' WHERE email='" + email + "';";
 
 		try {
@@ -328,7 +328,7 @@ public class Database {
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-			
+
 			databaseTracker.addQuery(query);
 
 			return true;
@@ -344,7 +344,7 @@ public class Database {
 
 		Statement edit;
 		String query;
-		
+
 		query = "UPDATE player SET username='" + new_username + "' WHERE email='" + email + "';";
 
 		try {
@@ -352,7 +352,7 @@ public class Database {
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-			
+
 			databaseTracker.addQuery(query);
 
 			return true;
@@ -364,19 +364,19 @@ public class Database {
 
 	}
 
-	public Boolean editPlayerAge(String email, String new_age) {
+	public Boolean editPlayerBirthdate(String email, String new_birthdate) {
 
 		Statement edit;
 		String query;
-		
-		query = "UPDATE player SET age=" + Integer.parseInt(new_age) + " WHERE email='" + email + "';";
+
+		query = "UPDATE player SET birthdate = '" + new_birthdate + "' WHERE email='" + email + "';";
 
 		try {
 
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-			
+
 			databaseTracker.addQuery(query);
 
 			return true;
@@ -392,7 +392,7 @@ public class Database {
 
 		Statement edit;
 		String query;
-		
+
 		query = "UPDATE player SET country='" + new_country + "' WHERE email='" + email + "';";
 
 		try {
@@ -400,7 +400,7 @@ public class Database {
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-			
+
 			databaseTracker.addQuery(query);
 
 			return true;
@@ -412,22 +412,48 @@ public class Database {
 
 	}
 
-	public Boolean createPlayer(String username, String password, String name, String email, String age,
+	public int getPlayerPoints(String email) {
+
+		Statement player_points;
+
+		try {
+
+			player_points = connection.createStatement();
+
+			ResultSet points_result;
+
+			points_result = player_points.executeQuery("SELECT points FROM player WHERE email = '" + email + "';");
+
+			if (!points_result.next()) {
+				System.out.println("[DATABASE] No players registered with that email!");
+				return 0;
+			} else {
+				return points_result.getInt("points");
+			}
+
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
+		return 0;
+
+	}
+
+	public Boolean createPlayer(String username, String password, String name, String email, String birthdate,
 			String country) {
 
 		Statement edit;
 		String query;
-		
-		query = "INSERT INTO Player (username, password, name, email, age, country) VALUES ('" + username
-				+ "','" + password + "','" + name + "','" + email + "'," + Integer.parseInt(age) + ",'" + country
-				+ "');";
+
+		query = "INSERT INTO Player (username, password, name, email, age, country) VALUES ('" + username + "','"
+				+ password + "','" + name + "','" + email + "','" + birthdate + "','" + country + "');";
 
 		try {
 
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-			
+
 			databaseTracker.addQuery(query);
 
 			return true;
@@ -443,7 +469,7 @@ public class Database {
 
 		Statement delete;
 		String query;
-		
+
 		query = "DELETE FROM player WHERE email = '" + email + "';";
 
 		try {
@@ -451,7 +477,7 @@ public class Database {
 			delete = connection.createStatement();
 
 			delete.executeUpdate(query);
-			
+
 			databaseTracker.addQuery(query);
 
 			return true;

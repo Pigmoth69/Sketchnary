@@ -9,20 +9,22 @@ public class Player {
 	private String password;
 	private String name;
 	private String email;
-	private int age;
+	private String birthdate;
 	private String country;
+	private int points;
 	
 	private ArrayList<Player> friends;
 
-	public Player(int id, String username, String password, String name, String email, int age, String country){
+	public Player(int id, String username, String password, String name, String email, String birthdate, String country, int points){
 		
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.name = name;
 		this.email = email;
-		this.age = age;
+		this.birthdate = birthdate;
 		this.country = country;
+		this.points = points;
 		
 		friends = new ArrayList<Player>();
 		
@@ -48,12 +50,16 @@ public class Player {
 		return email;
 	}
 	
-	public int getAge(){
-		return age;
+	public String getBirthdate(){
+		return birthdate;
 	}
 	
 	public String getCountry(){
 		return country;
+	}
+	
+	public int getPoints(){
+		return points;
 	}
 	
 	public ArrayList<Player> getFriends(){

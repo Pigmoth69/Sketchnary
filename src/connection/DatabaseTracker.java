@@ -7,14 +7,10 @@ import manager.Manager;
 public class DatabaseTracker implements Runnable{
 
 	private Manager manager;
-	
-	private int loop;
-	private long initial_time;
+
 	private ArrayList<String> queries;
 	
 	public DatabaseTracker(){
-		this.loop = 0;
-		
 		this.queries = new ArrayList<String>();
 	}
 	
@@ -35,19 +31,16 @@ public class DatabaseTracker implements Runnable{
 		
 		while(true){
 			
-			initial_time = System.nanoTime();
-			
 			try {
-				Thread.sleep(400);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
-			if((queries.size() > 5 || loop % 5 == 0) && queries.size() > 0){
+			if(queries.size() > 0){
 				System.out.println("[DATABASE TRACKER] Loading new queries to the queue");
 				addToSendQueue();
 			}
-			loop++;
 			
 		}
 		

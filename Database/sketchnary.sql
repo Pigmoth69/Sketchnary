@@ -8,9 +8,10 @@ CREATE TABLE Player(
     password text NOT NULL,
     name text NOT NULL,
     email text NOT NULL,
-    age integer NOT NULL,
+    birthdate date NOT NULL,
     country text,
-    CONSTRAINT "valid age" CHECK (age > 0)
+    points integer NOT NULL,
+    CONSTRAINT "valid points" CHECK (points > 0)
 );
 
 --- PLAYER SEQUENCE ---

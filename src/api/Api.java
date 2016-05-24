@@ -79,7 +79,7 @@ public class Api implements HttpHandler {
 		String password = null;	
 		String name = null;
 		String username = null;
-		String age = null;
+		String birthdate = null;
 		String country = null;
 		
 		if(filtered.containsKey("password"))
@@ -88,8 +88,8 @@ public class Api implements HttpHandler {
 			name = filtered.get("name");
 		if(filtered.containsKey("username"))
 			username = filtered.get("username");
-		if(filtered.containsKey("age"))
-			age = filtered.get("age");
+		if(filtered.containsKey("birthdate"))
+			birthdate = filtered.get("birthdate");
 		if(filtered.containsKey("country"))
 			country = filtered.get("country");
 
@@ -108,7 +108,7 @@ public class Api implements HttpHandler {
 			if (username == null)
 				response(exchange, "Null Username!");
 			else
-				handlePOST(exchange, username, password, name, email, age, country);
+				handlePOST(exchange, username, password, name, email, birthdate, country);
 			break;
 		case "PUT":
 			System.out.println("[EVENT] Processing PUT request");
@@ -120,10 +120,10 @@ public class Api implements HttpHandler {
 				response(exchange, "Null Name!");
 			else if(email == null)
 				response(exchange, "Null Email!");
-			else if(age == null)
-				response(exchange, "Invalid Age!");
+			else if(birthdate == null)
+				response(exchange, "Invalid Birthdate!");
 			else
-				handlePUT(exchange, username, password, name, email, age, country);
+				handlePUT(exchange, username, password, name, email, birthdate, country);
 			break;
 		case "DELETE":
 			System.out.println("[EVENT] Processing DELETE request");
@@ -167,11 +167,11 @@ public class Api implements HttpHandler {
 	 * @param password
 	 * @param name
 	 * @param email
-	 * @param age
+	 * @param birthdate
 	 * @param country
 	 */
 	private void handlePOST(HttpExchange exchange, String username, String password, String name, String email,
-			String age, String country) {
+			String birthdate, String country) {
 
 		User user = new User(database, email, password);
 		
@@ -179,8 +179,8 @@ public class Api implements HttpHandler {
 			user.setName(name);
 		if(username != null)
 			user.setUsername(username);
-		if(age != null)
-			user.setAge(age);
+		if(birthdate != null)
+			user.setBirthdate(birthdate);
 		if(country != null)
 			user.setCountry(country);
 
@@ -201,17 +201,17 @@ public class Api implements HttpHandler {
 	 * @param password
 	 * @param name
 	 * @param email
-	 * @param age
+	 * @param birthdate
 	 * @param country
 	 */
 	private void handlePUT(HttpExchange exchange, String username, String password, String name, String email,
-			String age, String country) {
+			String birthdate, String country) {
 
 		User user = new User(database, email, password);
 		
 		user.setName(name);
 		user.setUsername(username);
-		user.setAge(age);
+		user.setBirthdate(birthdate);
 		user.setCountry(country);
 
 		int response_code = user.UserPUT();

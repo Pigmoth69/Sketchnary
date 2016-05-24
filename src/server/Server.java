@@ -56,15 +56,6 @@ public class Server {
 			
 			server.setupHttpsConnection();
 			
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			Player player = new Player(3, "coolGuy", "3cool3", "francis", "francis@gmail.com", 18, "France");
-			server.database.addPlayer(player);
-			
 		} else {
 			server.backupServer = new BackupServer(server.database, server.port_c1, server.port_c2);
 			server.backupServer.start();
