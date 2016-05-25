@@ -4,15 +4,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import connection.Database;
+import utilities.Constants;
 
 public class Api implements HttpHandler {
 
@@ -24,9 +31,9 @@ public class Api implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
-		
+
 		System.out.println("[HANDLER] Detected an https request");
-		
+
 		String method = exchange.getRequestMethod();
 		URI uri = exchange.getRequestURI();
 
@@ -35,7 +42,7 @@ public class Api implements HttpHandler {
 
 		if (query == null)
 			query = "";
-				
+
 		Map<String, String> filtered = filter(query);
 
 		try {
@@ -52,17 +59,17 @@ public class Api implements HttpHandler {
 		Headers headers = exchange.getResponseHeaders();
 		headers.add("Content-Type", "application/json");
 
-		String body = getBody(exchange); 
+		String body = getBody(exchange);
 
-		if (paths[1].equals("event"))
-			processEvent(exchange, method, body, paths, filtered);
+		if (paths[1].equals("user"))
+			processEventUser(exchange, method, body, paths, filtered);
 		else
 			response(exchange, "[EVENT] Not an event");
 
 	}
 
 	/**
-	 * Process all types of events
+	 * Process user account requests
 	 * 
 	 * @param exchange
 	 * @param method
@@ -70,67 +77,67 @@ public class Api implements HttpHandler {
 	 * @param paths
 	 * @param filtered
 	 */
-	private void processEvent(HttpExchange exchange, String method, String body, String[] paths,
+	private void processEventUser(HttpExchange exchange, String method, String body, String[] paths,
 			Map<String, String> filtered) {
-		
-		System.out.println("[EVENT] Processing event");
-		
+
+		System.out.println("[USER EVENT] Processing event");
+
 		String email = filtered.get("email");
-		String password = null;	
+		String password = null;
 		String name = null;
 		String username = null;
 		String birthdate = null;
 		String country = null;
-		
-		if(filtered.containsKey("password"))
+
+		if (filtered.containsKey("password"))
 			password = filtered.get("password");
-		if(filtered.containsKey("name"))
+		if (filtered.containsKey("name"))
 			name = filtered.get("name");
-		if(filtered.containsKey("username"))
+		if (filtered.containsKey("username"))
 			username = filtered.get("username");
-		if(filtered.containsKey("birthdate"))
+		if (filtered.containsKey("birthdate"))
 			birthdate = filtered.get("birthdate");
-		if(filtered.containsKey("country"))
+		if (filtered.containsKey("country"))
 			country = filtered.get("country");
 
 		switch (method) {
 		case "GET":
-			System.out.println("[EVENT] Processing GET request");
+			System.out.println("[USER EVENT] Processing GET request");
 			if (email == null)
 				response(exchange, "Invalid email!");
 			else if (password == null)
 				response(exchange, "Invalid password!");
 			else
-				handleGET(exchange, email, password);
+				handleUserGET(exchange, email, password);
 			break;
 		case "POST":
-			System.out.println("[EVENT] Processing POST request");
+			System.out.println("[USER EVENT] Processing POST request");
 			if (username == null)
 				response(exchange, "Null Username!");
 			else
-				handlePOST(exchange, username, password, name, email, birthdate, country);
+				handleUserPOST(exchange, username, password, name, email, birthdate, country);
 			break;
 		case "PUT":
-			System.out.println("[EVENT] Processing PUT request");
+			System.out.println("[USER EVENT] Processing PUT request");
 			if (username == null)
 				response(exchange, "Null Username!");
 			else if (password == null)
 				response(exchange, "Null Password!");
-			else if(name == null)
+			else if (name == null)
 				response(exchange, "Null Name!");
-			else if(email == null)
+			else if (email == null)
 				response(exchange, "Null Email!");
-			else if(birthdate == null)
+			else if (birthdate == null)
 				response(exchange, "Invalid Birthdate!");
 			else
-				handlePUT(exchange, username, password, name, email, birthdate, country);
+				handleUserPUT(exchange, username, password, name, email, birthdate, country);
 			break;
 		case "DELETE":
-			System.out.println("[EVENT] Processing DELETE request");
-			handleDELETE(exchange, username, password);
+			System.out.println("[USER EVENT] Processing DELETE request");
+			handleUserDELETE(exchange, username, password);
 			break;
 		default:
-			System.out.println("nenhum dos HTTP");
+			System.out.println("[USER EVENT] Unknow request");
 			break;
 		}
 	}
@@ -142,20 +149,38 @@ public class Api implements HttpHandler {
 	 * @param username
 	 * @param password
 	 */
-	private void handleGET(HttpExchange exchange, String email, String password) {
+	private void handleUserGET(HttpExchange exchange, String email, String password) {
 
 		User user = new User(database, email, password);
 
-		int response_code = user.UserGET();
+		JSONObject json;
+		ResultSet result;
 
-		if (response_code == -1)
-			response(exchange, "Invalid email!");
-		else if(response_code == -2)
-			response(exchange, "Invalid password!");
-		else if(response_code == 2)
-			response(exchange, "Login successful!");
-		else
-			response(exchange, "Unknown error!");
+		String response_code = user.UserGET();
+		result = user.getPlayerInfo(email);
+
+		try {
+			if (result.next()) {
+
+				if (response_code.equals(Constants.ERROR_USER_EMAIL)) {
+					json = buildJson(Constants.ERROR, "Invalid email!", null, null, null, null, null);
+					response(exchange, json.toString());
+				} else if (response_code.equals(Constants.ERROR_USER_PASSWORD)) {
+					json = buildJson(Constants.ERROR, "Invalid password!", null, null, null, null, null);
+					response(exchange, json.toString());
+				} else if (response_code.equals(Constants.OK)) {
+					json = buildJson(Constants.OK, null, result.getString("username"), result.getString("name"),
+							result.getString("birthdate"), result.getString("country"), result.getString("points"));
+					response(exchange, json.toString());
+				} else {
+					json = buildJson(Constants.ERROR, "Unknown Error!", null, null, null, null, null);
+					response(exchange, json.toString());
+				}
+
+			} 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -170,18 +195,18 @@ public class Api implements HttpHandler {
 	 * @param birthdate
 	 * @param country
 	 */
-	private void handlePOST(HttpExchange exchange, String username, String password, String name, String email,
+	private void handleUserPOST(HttpExchange exchange, String username, String password, String name, String email,
 			String birthdate, String country) {
 
 		User user = new User(database, email, password);
-		
-		if(name != null)
+
+		if (name != null)
 			user.setName(name);
-		if(username != null)
+		if (username != null)
 			user.setUsername(username);
-		if(birthdate != null)
+		if (birthdate != null)
 			user.setBirthdate(birthdate);
-		if(country != null)
+		if (country != null)
 			user.setCountry(country);
 
 		int response_code = user.UserPOST();
@@ -204,11 +229,11 @@ public class Api implements HttpHandler {
 	 * @param birthdate
 	 * @param country
 	 */
-	private void handlePUT(HttpExchange exchange, String username, String password, String name, String email,
+	private void handleUserPUT(HttpExchange exchange, String username, String password, String name, String email,
 			String birthdate, String country) {
 
 		User user = new User(database, email, password);
-		
+
 		user.setName(name);
 		user.setUsername(username);
 		user.setBirthdate(birthdate);
@@ -228,7 +253,7 @@ public class Api implements HttpHandler {
 	 * 
 	 * @param username
 	 */
-	private void handleDELETE(HttpExchange exchange, String username, String password) {
+	private void handleUserDELETE(HttpExchange exchange, String username, String password) {
 
 		User user = new User(database, username, password);
 
@@ -239,6 +264,37 @@ public class Api implements HttpHandler {
 		else
 			response(exchange, "Not Found!");
 
+	}
+
+	public JSONObject buildJson(String status, String reason, String username, String name, String birthdate,
+			String country, String points) {
+
+		JSONObject json = new JSONObject();
+
+		if (status.equals(Constants.ERROR)) {
+			try {
+				json.put("status", status);
+				json.put("reason", reason);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+		} else {
+
+			try {
+				json.put("status", status);
+				json.put("username", username);
+				json.put("name", name);
+				json.put("birthdate", birthdate);
+				json.put("country", country);
+				json.put("points", points);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		return json;
 	}
 
 	/**

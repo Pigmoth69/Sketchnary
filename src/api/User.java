@@ -1,6 +1,9 @@
 package api;
 
+import java.sql.ResultSet;
+
 import connection.Database;
+import utilities.Constants;
 
 public class User {
 	
@@ -39,18 +42,18 @@ public class User {
 	 * Process a GET request for LOGIN operations
 	 * @return http response code
 	 */
-	public int UserGET(){
+	public String UserGET(){
 		
 		String status = database.playerVerification(email, password);
 		
 		if(status.equals("email"))
-			return -1;
+			return Constants.ERROR_USER_EMAIL;
 		else if(status.equals("password"))
-			return -2;
+			return Constants.ERROR_USER_PASSWORD;
 		else if(status.equals("true"))
-			return 2;
+			return Constants.OK;
 		else
-			return 404;
+			return Constants.ERROR;
 		
 	}
 	
@@ -111,6 +114,12 @@ public class User {
 		if(database.deletePlayer(email))
 			return 200;
 		return 404;
+		
+	}
+	
+	public ResultSet getPlayerInfo(String email){
+		
+		return database.playerInfo(email);
 		
 	}
 	

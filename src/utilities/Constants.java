@@ -25,5 +25,11 @@ public class Constants {
 	public static final String ERROR_HD_RESEND = "error-hd-resend";
 	public static final String ERROR_HD_RESEND1 = "error-hd-resend1";
 	public static final String ERROR_HD_RESEND2 = "error-hd-resend2";
+	
+	/**
+	 * Errors occuring in User https requests
+	 */
+	public static final String ERROR_USER_EMAIL = "error-user-email";
+	public static final String ERROR_USER_PASSWORD = "error-user-password";
 
 }

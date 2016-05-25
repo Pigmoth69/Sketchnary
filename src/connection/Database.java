@@ -508,4 +508,26 @@ public class Database {
 
 	}
 
+	public ResultSet playerInfo(String email) {
+		
+		Statement statement;
+		
+		ResultSet result = null;
+
+		try {
+
+			statement = connection.createStatement();
+
+			result = statement
+					.executeQuery("SELECT username, name, birthdate, country, points FROM player WHERE email = '" + email + "';");
+
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return result;
+	}
+
 }
