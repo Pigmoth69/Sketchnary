@@ -3,7 +3,10 @@ package api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,18 +23,21 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import connection.Database;
+import data.Online;
+import data.Player;
 import gameEngine.RoomsEngine;
-import server.Player;
 import utilities.Constants;
 
 public class Api implements HttpHandler {
 
 	private Database database;
 	private RoomsEngine roomsEngine;
+	private Online online;
 
-	public Api(Database database, RoomsEngine roomsEngine) {
+	public Api(Database database, RoomsEngine roomsEngine, Online online) {
 		this.database = database;
 		this.roomsEngine = roomsEngine;
+		this.online = online;
 	}
 
 	@Override
@@ -181,6 +187,11 @@ public class Api implements HttpHandler {
 				} else if (response_code.equals(Constants.OK)) {
 					json = buildJsonLogin(Constants.OK, null, result.getString("username"), result.getString("name"),
 							result.getString("birthdate"), result.getString("country"), result.getString("points"));
+					Player player = new Player(result.getInt("id"), result.getString("username"),
+							result.getString("password"), result.getString("name"), email,
+							result.getString("birthdate"), result.getString("country"), result.getInt("points"));
+					online.addPlayer(player);
+					notifyFriends(online.findFriends(player));
 					response(exchange, json.toString());
 				} else {
 					json = buildJsonLogin(Constants.ERROR, "Unknown Error!", null, null, null, null, null);
@@ -192,6 +203,32 @@ public class Api implements HttpHandler {
 			e.printStackTrace();
 		}
 
+	}
+
+	private void notifyFriends(ArrayList<Player> findFriends) {
+
+		for(int i = 0; i < findFriends.size(); i++)
+			notifyFriend(findFriends.get(i));
+		
+	}
+
+	public void notifyFriend(Player friend){
+	
+		try{
+			URL url = new URL("http://www.example.com/resource");
+			HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+			httpCon.setDoOutput(true);
+			httpCon.setRequestMethod("GET");
+		
+			OutputStreamWriter out = new OutputStreamWriter(
+		    httpCon.getOutputStream());
+			out.write("Player online");
+			out.close();
+			httpCon.getInputStream();
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		
 	}
 
 	/**
@@ -388,31 +425,31 @@ public class Api implements HttpHandler {
 			if (rooms.equals("all")) {
 				json = buildAllRoomsJson(room);
 				response(exchange, json.toString());
-			}else{
+			} else {
 				json = createRoomObject(room.getID(), room.getPlayers());
 				response(exchange, json.toString());
 			}
 		}
 
 	}
-	
+
 	private JSONObject buildAllRoomsJson(Room room) {
 
 		JSONObject json = new JSONObject();
 		JSONObject temp = new JSONObject();
 		JSONArray jArray = new JSONArray();
-		
+
 		String id;
 		ArrayList<Player> players;
 
 		for (Map.Entry<String, ArrayList<Player>> entry : room.getRooms().entrySet()) {
 			id = entry.getKey();
 			players = entry.getValue();
-			
+
 			temp = createRoomObject(id, players);
 			jArray.put(temp);
 		}
-		
+
 		try {
 			json.put("rooms", jArray);
 		} catch (JSONException e) {
@@ -423,29 +460,29 @@ public class Api implements HttpHandler {
 	}
 
 	private JSONObject createRoomObject(String id, ArrayList<Player> players) {
-		
+
 		JSONObject json = new JSONObject();
 		JSONArray jArray = new JSONArray();
-		
+
 		try {
 			json.put("room", id);
 
-			for(int i = 0; i < players.size(); i++){
-				
+			for (int i = 0; i < players.size(); i++) {
+
 				JSONObject temp = new JSONObject();
 				temp.put("player", players.get(i).getEmail());
 				jArray.put(temp);
-				
+
 			}
-			
+
 			json.put("players", jArray);
-			
+
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
+
 		return json;
-		
+
 	}
 
 	private JSONObject buildJsonRooms(String status, String reason) {

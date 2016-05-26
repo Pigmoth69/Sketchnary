@@ -1,4 +1,4 @@
-package server;
+package data;
 
 public class Friend {
 	

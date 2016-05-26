@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import server.Player;
+import data.Player;
 
 public class GameRoom implements Runnable {
 	

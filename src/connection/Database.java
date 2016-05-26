@@ -1,12 +1,12 @@
 package connection;
 
-import server.Friend;
-import server.Player;
-import server.ServerData;
 import utilities.Constants;
 
 import java.sql.Statement;
 
+import data.Friend;
+import data.Player;
+import data.ServerData;
 import manager.Manager;
 
 import java.sql.Connection;
@@ -87,6 +87,8 @@ public class Database {
 	public void recoverDatabase() {
 
 		Statement recover;
+		String player_query;
+		String friend_query;
 
 		try {
 			recover = connection.createStatement();
@@ -100,6 +102,14 @@ public class Database {
 						player.getString("country"), player.getInt("points"));
 				serverData.addPlayer(pl);
 
+				player_query = "INSERT INTO player (username, password, name, email, birthdate, country, points) VALUES ('"
+						+ player.getString("username") + "','" + player.getString("password") + "','"
+						+ player.getString("name") + "','" + player.getString("email") + "','"
+						+ player.getString("birthdate") + "','" + player.getString("country") + "',"
+						+ player.getInt("points") + ");";
+
+				databaseTracker.addQuery(player_query);
+
 			}
 
 			ResultSet friend = recover.executeQuery("SELECT * FROM friend");
@@ -109,6 +119,11 @@ public class Database {
 				Friend fr = new Friend(friend.getInt("id_player"), friend.getInt("id_friend"));
 				serverData.addFriend(fr);
 
+				friend_query = "INSERT INTO friend (id_player, id_friend) VALUES (" + friend.getInt("id_player") + ","
+						+ friend.getInt("id_friend") + ");";
+
+				databaseTracker.addQuery(friend_query);
+
 			}
 
 		} catch (SQLException e) {
@@ -116,137 +131,6 @@ public class Database {
 		}
 
 		serverData.updateFriendsList();
-
-	}
-
-	public void insertIntoDatabase(Player player) {
-
-		Statement statement;
-
-		try {
-			statement = connection.createStatement();
-
-			statement.executeUpdate(
-					"INSERT INTO player (username, password, name, email, birthdate, country) " + "VALUES ('"
-							+ player.getUsername() + "', '" + player.getPassword() + "', '" + player.getName() + "', '"
-							+ player.getEmail() + "', '" + player.getBirthdate() + "', '" + player.getCountry() + "')");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void insertIntoDatabase(Friend friend) {
-
-		Statement statement;
-
-		try {
-			statement = connection.createStatement();
-
-			statement.executeUpdate("INSERT INTO friend (id_player, id_friend) " + "VALUES (" + friend.getIdPlayer()
-					+ ", " + friend.getIdFriend() + ");");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void selectFromDatabase() {
-
-		Statement statement;
-
-		try {
-
-			statement = connection.createStatement();
-
-			ResultSet result = statement.executeQuery("SELECT name FROM player;");
-
-			while (result.next()) {
-				System.out.println(result.getString("name"));
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public void deleteFromDatabase(int id_player) {
-
-		Statement statement;
-
-		try {
-
-			statement = connection.createStatement();
-
-			statement.executeUpdate("DELETE FROM Player WHERE id = " + id_player);
-
-			System.out.println("[DATABASE] Deleted player successfully!");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public void deleteFromDatabase(int id_player, int id_friend) {
-
-		Statement statement;
-
-		try {
-
-			statement = connection.createStatement();
-
-			statement.executeUpdate(
-					"DELETE FROM Friend WHERE id_player = " + id_player + " AND id_friend = " + id_friend + ";");
-
-			System.out.println("[DATABASE] Deleted friend sucessfully!");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public void addFriend(int id_player, int id_friend) {
-
-		Statement statement;
-
-		try {
-
-			statement = connection.createStatement();
-
-			statement.executeUpdate(
-					"INSERT INTO Friend (id_player, id_friend) VALUES (" + id_player + "," + id_friend + ");");
-
-			System.out.println("[DATABASE] Added friend successfully!");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public void addPlayer(Player player) {
-
-		Statement statement;
-		String query;
-
-		query = "INSERT INTO Player (id, username, password, name, email, birthdate, country) VALUES (" + player.getId()
-				+ ",'" + player.getUsername() + "','" + player.getPassword() + "','" + player.getName() + "','"
-				+ player.getEmail() + "'," + player.getBirthdate() + ",'" + player.getCountry() + "');";
-
-		try {
-
-			statement = connection.createStatement();
-
-			statement.executeUpdate(query);
-
-			databaseTracker.addQuery(query);
-
-			System.out.println("[DATABASE] Added player successfully!");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 
 	}
 
@@ -476,7 +360,7 @@ public class Database {
 		String fake_username = "fake";
 		String error;
 
-		query = "INSERT INTO Player (username, password, name, email, birthdate, country, points) VALUES ('"
+		query = "INSERT INTO player (username, password, name, email, birthdate, country, points) VALUES ('"
 				+ fake_username + "','" + password + "','" + name + "','" + email + "','" + birthdate + "','" + country
 				+ "', " + points + ");";
 
@@ -578,7 +462,7 @@ public class Database {
 			statement = connection.createStatement();
 
 			result = statement.executeQuery(
-					"SELECT username, name, birthdate, country, points FROM player WHERE email = '" + email + "';");
+					"SELECT * FROM player WHERE email = '" + email + "';");
 
 		} catch (SQLException e) {
 			e.printStackTrace();

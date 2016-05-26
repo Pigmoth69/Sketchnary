@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import data.Player;
 import gameEngine.GameRoom;
 import gameEngine.RoomsEngine;
-import server.Player;
 import utilities.Constants;
 
 public class Room {
