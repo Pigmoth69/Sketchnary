@@ -15,6 +15,7 @@ public class User {
 	private String username = null;
 	private String birthdate = null;
 	private String country = null;
+	private int points = 0;
 	
 	public User(Database database, String email, String password){
 		this.database = database;
@@ -36,6 +37,10 @@ public class User {
 	
 	public void setCountry(String country){
 		this.country = country;
+	}
+	
+	public void setPoints(int points){
+		this.points = points;
 	}
 	
 	/**
@@ -85,6 +90,10 @@ public class User {
 			database.editPlayerCountry(email, country);
 			controller = true;
 		}
+		if(points != 0){
+			database.editPlayerPoints(email, points);
+			controller = true;
+		}
 		
 		if(controller)
 			return 200;
@@ -97,11 +106,9 @@ public class User {
 	 * Process a PUT request for REGISTER operations
 	 * @return http response code
 	 */
-	public int UserPUT(){
+	public String UserPUT(){
 		
-		if(database.createPlayer(username, password, name, email, birthdate, country))
-			return 200;
-		return 404;
+		return database.createPlayer(username, password, name, email, birthdate, country, points);
 		
 	}
 	

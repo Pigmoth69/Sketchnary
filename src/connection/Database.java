@@ -3,6 +3,7 @@ package connection;
 import server.Friend;
 import server.Player;
 import server.ServerData;
+import utilities.Constants;
 
 import java.sql.Statement;
 
@@ -125,9 +126,10 @@ public class Database {
 		try {
 			statement = connection.createStatement();
 
-			statement.executeUpdate("INSERT INTO player (username, password, name, email, birthdate, country) " + "VALUES ('"
-					+ player.getUsername() + "', '" + player.getPassword() + "', '" + player.getName() + "', '"
-					+ player.getEmail() + "', '" + player.getBirthdate() + "', '" + player.getCountry() + "')");
+			statement.executeUpdate(
+					"INSERT INTO player (username, password, name, email, birthdate, country) " + "VALUES ('"
+							+ player.getUsername() + "', '" + player.getPassword() + "', '" + player.getName() + "', '"
+							+ player.getEmail() + "', '" + player.getBirthdate() + "', '" + player.getCountry() + "')");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -412,6 +414,30 @@ public class Database {
 
 	}
 
+	public Boolean editPlayerPoints(String email, int points) {
+
+		Statement edit;
+		String query;
+
+		query = "UPDATE player SET points='" + points + "' WHERE email='" + email + "';";
+
+		try {
+
+			edit = connection.createStatement();
+
+			edit.executeUpdate(query);
+
+			databaseTracker.addQuery(query);
+
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
 	public int getPlayerPoints(String email) {
 
 		Statement player_points;
@@ -434,19 +460,25 @@ public class Database {
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		return 0;
 
 	}
 
-	public Boolean createPlayer(String username, String password, String name, String email, String birthdate,
-			String country) {
+	public String createPlayer(String username, String password, String name, String email, String birthdate,
+			String country, int points) {
 
 		Statement edit;
+		Statement new_edit;
+		Statement safe_edit;
 		String query;
 
-		query = "INSERT INTO Player (username, password, name, email, age, country) VALUES ('" + username + "','"
-				+ password + "','" + name + "','" + email + "','" + birthdate + "','" + country + "');";
+		String fake_username = "fake";
+		String error;
+
+		query = "INSERT INTO Player (username, password, name, email, birthdate, country, points) VALUES ('"
+				+ fake_username + "','" + password + "','" + name + "','" + email + "','" + birthdate + "','" + country
+				+ "', " + points + ");";
 
 		try {
 
@@ -454,14 +486,41 @@ public class Database {
 
 			edit.executeUpdate(query);
 
-			databaseTracker.addQuery(query);
+		} catch (SQLException e) {
+			error = e.getSQLState();
+			System.out.println("Error code " + error);
+			if (error.equals("23505"))
+				return Constants.ERROR_DB_DUPLICATE_EMAIL;
+		}
 
-			return true;
+		try {
+
+			new_edit = connection.createStatement();
+
+			new_edit.executeUpdate("UPDATE player SET username = '" + username + "' WHERE email = '" + email + "';");
 
 		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
+			error = e.getSQLState();
+			System.out.println("Error code 2 " + error);
+			if (error.equals("23505")) {
+				try {
+					safe_edit = connection.createStatement();
+					safe_edit.executeUpdate("DELETE FROM player WHERE email = '" + email + "';");
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+
+				return Constants.ERROR_DB_DUPLICATE_USERNAME;
+			}
 		}
+
+		query = "INSERT INTO Player (username, password, name, email, birthdate, country, points) VALUES ('" + username
+				+ "','" + password + "','" + name + "','" + email + "','" + birthdate + "','" + country + "', " + points
+				+ ");";
+
+		databaseTracker.addQuery(query);
+
+		return Constants.OK;
 
 	}
 
@@ -509,24 +568,23 @@ public class Database {
 	}
 
 	public ResultSet playerInfo(String email) {
-		
+
 		Statement statement;
-		
+
 		ResultSet result = null;
 
 		try {
 
 			statement = connection.createStatement();
 
-			result = statement
-					.executeQuery("SELECT username, name, birthdate, country, points FROM player WHERE email = '" + email + "';");
-
+			result = statement.executeQuery(
+					"SELECT username, name, birthdate, country, points FROM player WHERE email = '" + email + "';");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		return result;
 	}
 

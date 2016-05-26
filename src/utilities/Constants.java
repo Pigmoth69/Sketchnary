@@ -31,5 +31,12 @@ public class Constants {
 	 */
 	public static final String ERROR_USER_EMAIL = "error-user-email";
 	public static final String ERROR_USER_PASSWORD = "error-user-password";
+	
+	/**
+	 * Errors on the database
+	 */
+	public static final String ERROR_DB_DUPLICATE = "error-database-duplicate";
+	public static final String ERROR_DB_DUPLICATE_EMAIL = "error-database-duplicate-email";
+	public static final String ERROR_DB_DUPLICATE_USERNAME = "error-database-duplicate-username";
 
 }
