@@ -13,13 +13,16 @@ import com.sun.net.httpserver.HttpsServer;
 
 import api.Api;
 import connection.Database;
+import gameEngine.RoomsEngine;
 
 public class HttpsConnection {
 
 	private Database database;
+	private RoomsEngine roomsEngine;
 
-	public HttpsConnection(Database database) {
+	public HttpsConnection(Database database, RoomsEngine roomsEngine) {
 		this.database = database;
+		this.roomsEngine = roomsEngine;
 	}
 
 	private SSLContext createSSLContext() {
@@ -53,7 +56,7 @@ public class HttpsConnection {
 			httpserver = HttpsServer.create(new InetSocketAddress(443), 0);
 			httpserver.setHttpsConfigurator(new HttpsConfigurator(createSSLContext()));
 
-			httpserver.createContext("/api", new Api(database));
+			httpserver.createContext("/api", new Api(database, roomsEngine));
 			httpserver.setExecutor(null);
 			httpserver.start();
 

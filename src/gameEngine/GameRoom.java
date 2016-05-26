@@ -9,17 +9,26 @@ import java.util.Random;
 import server.Player;
 
 public class GameRoom implements Runnable {
+	
 	private Thread t;
+	
+	private String id;
 	private String threadName;
+	private int rounds;
+	
 	private HashMap<Integer, Integer> leaderboard;
 	private ArrayList<String> words;
-	private int rounds;
+	private ArrayList<Player> players;
 
-	public GameRoom(String name, int rounds) {
+	public GameRoom(String id, String name, int rounds) {
 		threadName = name;
+		
+		this.id = id;
+		this.rounds = rounds;
+		
 		this.words = new ArrayList<String>();
 		this.leaderboard = new HashMap<Integer, Integer>();
-		this.rounds = rounds;
+		this.players = new ArrayList<Player>();
 	}
 
 	public void run() {
@@ -44,6 +53,8 @@ public class GameRoom implements Runnable {
 			t.start();
 		}
 	}
+	
+	
 
 	public boolean connectPlayer(Player player) {
 		if (this.leaderboard.size() >= 10)
@@ -52,6 +63,18 @@ public class GameRoom implements Runnable {
 			this.leaderboard.put(player.getId(), 0);
 			return true;
 		}
+	}
+	
+	public String getID(){
+		return id;
+	}
+	
+	public ArrayList<Player> getPlayers(){
+		return players;
+	}
+	
+	public void addPlayer(Player player){
+		players.add(player);
 	}
 
 	public void generateWordList(String filename) {

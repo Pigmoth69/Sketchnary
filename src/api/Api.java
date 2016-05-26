@@ -6,10 +6,12 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,14 +20,18 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import connection.Database;
+import gameEngine.RoomsEngine;
+import server.Player;
 import utilities.Constants;
 
 public class Api implements HttpHandler {
 
 	private Database database;
+	private RoomsEngine roomsEngine;
 
-	public Api(Database database) {
+	public Api(Database database, RoomsEngine roomsEngine) {
 		this.database = database;
+		this.roomsEngine = roomsEngine;
 	}
 
 	@Override
@@ -62,6 +68,8 @@ public class Api implements HttpHandler {
 
 		if (paths[1].equals("user"))
 			processEventUser(exchange, method, body, paths, filtered);
+		else if (paths[1].equals("room"))
+			processEventRoom(exchange, method, body, paths, filtered);
 		else
 			response(exchange, "[EVENT] Not an event");
 
@@ -99,7 +107,7 @@ public class Api implements HttpHandler {
 			birthdate = filtered.get("birthdate");
 		if (filtered.containsKey("country"))
 			country = filtered.get("country");
-		if(filtered.containsKey("points"))
+		if (filtered.containsKey("points"))
 			points = filtered.get("points");
 
 		switch (method) {
@@ -179,7 +187,7 @@ public class Api implements HttpHandler {
 					response(exchange, json.toString());
 				}
 
-			} 
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -243,19 +251,18 @@ public class Api implements HttpHandler {
 		user.setBirthdate(birthdate);
 		user.setCountry(country);
 		user.setPoints(Integer.parseInt(points));
-		
+
 		JSONObject json;
 
 		String response_code = user.UserPUT();
 
-		if (response_code.equals(Constants.ERROR_DB_DUPLICATE_EMAIL)){
+		if (response_code.equals(Constants.ERROR_DB_DUPLICATE_EMAIL)) {
 			json = buildJsonSignUp("error", "Email already exists!");
 			response(exchange, json.toString());
-		}
-		else if (response_code.equals(Constants.ERROR_DB_DUPLICATE_USERNAME)){
+		} else if (response_code.equals(Constants.ERROR_DB_DUPLICATE_USERNAME)) {
 			json = buildJsonSignUp("error", "Username already taken!");
 			response(exchange, json.toString());
-		} else{
+		} else {
 			json = buildJsonSignUp("ok", null);
 			response(exchange, json.toString());
 		}
@@ -310,9 +317,9 @@ public class Api implements HttpHandler {
 
 		return json;
 	}
-	
-	public JSONObject buildJsonSignUp(String status, String reason){
-		
+
+	public JSONObject buildJsonSignUp(String status, String reason) {
+
 		JSONObject json = new JSONObject();
 
 		if (status.equals(Constants.ERROR)) {
@@ -334,7 +341,125 @@ public class Api implements HttpHandler {
 		}
 
 		return json;
+
+	}
+
+	private void processEventRoom(HttpExchange exchange, String method, String body, String[] paths,
+			Map<String, String> filtered) {
+
+		System.out.println("[ROOM EVENT] Processing event");
+
+		String rooms = filtered.get("rooms");
+
+		switch (method) {
+		case "GET":
+			System.out.println("[ROOM EVENT] Processing GET request");
+			if (rooms == null)
+				response(exchange, "Invalid room request!");
+			else
+				handleRoomGET(exchange, rooms);
+			break;
+		case "POST":
+			break;
+		case "PUT":
+			break;
+		case "DELETE":
+			break;
+		default:
+			System.out.println("[USER EVENT] Unknow request");
+			break;
+		}
+
+	}
+
+	private void handleRoomGET(HttpExchange exchange, String rooms) {
+
+		Room room = new Room(roomsEngine, rooms);
+
+		JSONObject json;
+
+		String response_code = room.roomGET();
+
+		if (response_code.equals(Constants.ERROR_GR)) {
+			json = buildJsonRooms(Constants.ERROR, "No rooms found!");
+			response(exchange, json.toString());
+		} else {
+
+			if (rooms.equals("all")) {
+				json = buildAllRoomsJson(room);
+				response(exchange, json.toString());
+			}else{
+				json = createRoomObject(room.getID(), room.getPlayers());
+				response(exchange, json.toString());
+			}
+		}
+
+	}
+	
+	private JSONObject buildAllRoomsJson(Room room) {
+
+		JSONObject json = new JSONObject();
+		JSONObject temp = new JSONObject();
+		JSONArray jArray = new JSONArray();
 		
+		String id;
+		ArrayList<Player> players;
+
+		for (Map.Entry<String, ArrayList<Player>> entry : room.getRooms().entrySet()) {
+			id = entry.getKey();
+			players = entry.getValue();
+			
+			temp = createRoomObject(id, players);
+			jArray.put(temp);
+		}
+		
+		try {
+			json.put("rooms", jArray);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return json;
+	}
+
+	private JSONObject createRoomObject(String id, ArrayList<Player> players) {
+		
+		JSONObject json = new JSONObject();
+		JSONArray jArray = new JSONArray();
+		
+		try {
+			json.put("room", id);
+
+			for(int i = 0; i < players.size(); i++){
+				
+				JSONObject temp = new JSONObject();
+				temp.put("player", players.get(i).getEmail());
+				jArray.put(temp);
+				
+			}
+			
+			json.put("players", jArray);
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return json;
+		
+	}
+
+	private JSONObject buildJsonRooms(String status, String reason) {
+
+		JSONObject json = new JSONObject();
+
+		try {
+			json.put("status", status);
+			json.put("reason", reason);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return json;
 	}
 
 	/**

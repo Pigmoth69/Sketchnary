@@ -38,5 +38,10 @@ public class Constants {
 	public static final String ERROR_DB_DUPLICATE = "error-database-duplicate";
 	public static final String ERROR_DB_DUPLICATE_EMAIL = "error-database-duplicate-email";
 	public static final String ERROR_DB_DUPLICATE_USERNAME = "error-database-duplicate-username";
+	
+	/**
+	 * Errors on a game room
+	 */
+	public static final String ERROR_GR = "error-gameroom";
 
 }
