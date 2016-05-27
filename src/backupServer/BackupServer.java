@@ -6,24 +6,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import tcpConnection.TCPServer;
-
 public class BackupServer implements Runnable {
 
-	private TCPServer tcpServer;
-
-	private int port;
-
-	public BackupServer(int port) {
-		this.port = port;
-
-		try {
-			this.tcpServer = new TCPServer(this.port);
-			this.tcpServer.acceptSocket();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+	public BackupServer() {}
 
 	public void start() {
 		new Thread(this).start();

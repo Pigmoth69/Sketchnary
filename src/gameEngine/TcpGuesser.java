@@ -37,6 +37,17 @@ public class TcpGuesser implements Runnable {
 	}
 
 	@Override
-	public void run() {}
+	public void run() {
+		startGame();
+	}
+	
+	public void startGame() {
+		try {
+			tcp.send("start");
+			System.out.println("Sent start on guesser");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

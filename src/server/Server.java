@@ -19,18 +19,16 @@ public class Server {
 	private Online online;
 
 	private Boolean role;
-	private int port;
 
-	public Server(Boolean role, int port) {
+	public Server(Boolean role) {
 		serverData = new ServerData();
 
 		this.role = role;
-		this.port = port;
 	}
 
 	public static void main(String args[]) {
 
-		if (args.length != 3) {
+		if (args.length != 2) {
 			System.out.println("[SERVER] [ERROR] wrong number of arguments for server");
 			System.exit(0);
 		}
@@ -44,8 +42,8 @@ public class Server {
 		else
 			System.exit(1);
 
-		Server server = new Server(server_role, Integer.parseInt(args[1]));
-		server.setupDatabaseConnection(args[3], "postgres", "database123");
+		Server server = new Server(server_role);
+		server.setupDatabaseConnection(args[1], "postgres", "database123");
 
 		if (server.role) {
 			server.setupDatabaseBackup();
@@ -151,7 +149,7 @@ public class Server {
 	 */
 	public void setupBackup() {
 
-		backupServer = new BackupServer(port);
+		backupServer = new BackupServer();
 		backupServer.start();
 
 	}

@@ -139,10 +139,9 @@ public class ApiUtilities {
 
 	}
 
-	public JSONObject startRoom(HttpExchange exchange, Room room, String ip) {
+	public JSONObject startRoom(HttpExchange exchange, Room room, String ip, GameRoom gr) {
 
 		JSONObject json = new JSONObject();
-		GameRoom gr = null;
 
 		try {
 			int port = getPort();
@@ -184,7 +183,6 @@ public class ApiUtilities {
 			e.printStackTrace();
 		}
 
-		gr.start();
 		return json;
 
 	}

@@ -15,7 +15,8 @@ public class GameRoom implements Runnable {
 	private String catg;
 	private Player drawer;
 	private String winner;
-	private int tries = 2;
+	private int tries = 0;
+	private Boolean on = false;
 
 	private HashMap<Integer, Integer> leaderboard;
 	private ArrayList<Player> players;
@@ -38,23 +39,24 @@ public class GameRoom implements Runnable {
 
 	public void run() {
 		
-		TcpDrawer drawer = new TcpDrawer(this, players.get(0));
-		connectClients();
-		
 		while (winner == null) {
-			if (players.size() < 0)
+			if (players.size() < 2){
+				System.out.println("merda");
 				continue;
-			else if (players.size() > 0 && tries > 1){
+			}
+			else if (players.size() >= 2 && tries >= 1){
+				TcpDrawer drawer = new TcpDrawer(this, players.get(0));
+				connectClients();
 				drawer.start();
+				System.out.println("end");
 			}
 			else {
 
 				try {
-					Thread.sleep(2000);
+					Thread.sleep(1500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				
 				tries++;
 			}
 
@@ -65,10 +67,11 @@ public class GameRoom implements Runnable {
 	private void connectClients() {
 
 		for (int i = 0; i < players.size(); i++) {
-			if(players.get(i) != drawer){
+			if(!(players.get(i).getEmail().equals(drawer.getEmail()))){
 				TcpGuesser guesser = new TcpGuesser(players.get(i));
-				guesser.start();
 				guessers.add(guesser);
+				guesser.start();
+				System.out.println("[GAME ROOM] Starting guesser thread");
 			}
 		}
 
@@ -80,6 +83,7 @@ public class GameRoom implements Runnable {
 			t = new Thread(this, threadName);
 			t.start();
 		}
+		on = true;
 	}
 
 	public void setupTcp() {
@@ -151,6 +155,10 @@ public class GameRoom implements Runnable {
 
 	public ArrayList<TcpGuesser> getGuessers() {
 		return guessers;
+	}
+	
+	public Boolean isOff(){
+		return !on;
 	}
 
 }

@@ -25,20 +25,21 @@ public class TcpDrawer implements Runnable {
 
 		tcp.acceptSocket();
 	}
-
-	public void kill() {
-		alive = false;
-	}
 	
 	public void start(){
 		new Thread(this).start();
 	}
+	
+	public void kill(){
+		alive = false;
+	}
 
 	@Override
 	public void run() {
+		
+		startGame();
 
 		while (alive) {
-			startGame();
 			propagateBuffer();
 		}
 
@@ -47,6 +48,7 @@ public class TcpDrawer implements Runnable {
 	public void startGame() {
 		try {
 			tcp.send("start");
+			System.out.println("sent start");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -55,12 +57,12 @@ public class TcpDrawer implements Runnable {
 	public void propagateBuffer(){
 		
 		try {
-			System.out.println("Receber agora");
+			
 			String buffer = tcp.receive();
-			System.out.println("RECEBI");
+			
+			System.out.println("Buffer " + buffer);
 			
 			for(int i = 0; i < room.getGuessers().size(); i++){
-				System.out.println(i);
 				room.getGuessers().get(i).sendBuffer(buffer);
 			}
 		

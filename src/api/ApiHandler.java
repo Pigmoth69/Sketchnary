@@ -12,6 +12,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 import connection.Database;
 import gameEngine.RoomsEngine;
+import gameEngine.GameRoom;
 import utilities.Constants;
 
 public class ApiHandler implements Runnable {
@@ -332,7 +333,10 @@ public class ApiHandler implements Runnable {
 				json = apiUt.buildAllRoomsJson(room);
 				apiUt.response(exchange, json.toString());
 			} else {
-				json = apiUt.startRoom(exchange, room, ip);
+				GameRoom gr = room.findRoom();
+				if(gr.isOff())
+					gr.start();
+				json = apiUt.startRoom(exchange, room, ip, gr);
 				apiUt.response(exchange, json.toString());
 			}
 		}
