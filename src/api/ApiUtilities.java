@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 
 import org.json.JSONArray;
@@ -18,17 +19,27 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpsExchange;
 
 import data.Online;
 import data.Player;
+import data.ServerData;
+import gameEngine.GameRoom;
 import utilities.Constants;
 
 public class ApiUtilities {
 
 	private Online online;
+	private ServerData serverData;
 
-	public ApiUtilities(Online online) {
+	private ArrayList<Integer> ports;
+
+	public ApiUtilities(Online online, ServerData serverData) {
 		this.online = online;
+		this.serverData = serverData;
+		
+		ports = new ArrayList<Integer>();
+		fillPorts();
 	}
 
 	/**
@@ -46,7 +57,7 @@ public class ApiUtilities {
 		}
 
 		OutputStream output = exchange.getResponseBody();
-		
+
 		System.out.println(message);
 
 		try {
@@ -55,6 +66,23 @@ public class ApiUtilities {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	public void fillPorts() {
+
+		ports.add(1735);
+		ports.add(1761);
+		ports.add(1776);
+		ports.add(1792);
+		ports.add(1801);
+		ports.add(1812);
+		ports.add(1813);
+		ports.add(1863);
+		ports.add(1886);
+		ports.add(1920);
+		ports.add(1935);
+		ports.add(1947);
 
 	}
 
@@ -110,6 +138,72 @@ public class ApiUtilities {
 
 	}
 
+	public JSONObject startRoom(HttpExchange exchange, Room room, String ip) {
+
+		JSONObject json = new JSONObject();
+
+		try {
+			int port = getPort();
+			json.put("port", port);
+			GameRoom gr = room.findRoom();
+			gr.setPort(port);
+			
+			Player pl = serverData.findPlayerThroughIp(ip);
+			gr.addPlayer(pl);
+
+			if (gr.getDrawer() == null) {
+				json.put("role", "drawer");
+				json.put("word", gr.generateWord());
+				gr.setDrawer(pl);
+			} else {
+				json.put("role", "guesser");
+				ArrayList<String> words = gr.generateWordList();
+				JSONObject jo1 = new JSONObject();
+				JSONObject jo2 = new JSONObject();
+				JSONObject jo3 = new JSONObject();
+				jo1.put("1", words.get(0));
+				jo2.put("2", words.get(1));
+				jo3.put("3", words.get(2));
+
+				JSONArray ja = new JSONArray();
+				ja.put(jo1);
+				ja.put(jo2);
+				ja.put(jo3);
+
+				json.put("words", ja);
+			}
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return json;
+
+	}
+
+	private Player getPlayerFromIp(String ip, GameRoom room) {
+
+		System.out.println(room.getPlayers().size());
+		for (int i = 0; i < room.getPlayers().size(); i++) {
+			System.out.println(room.getPlayers().get(i).getIp());
+			if (room.getPlayers().get(i).getIp().equals(ip))
+				return room.getPlayers().get(i);
+
+		}
+
+		return null;
+	}
+
+	public int getPort() {
+
+		Random rand = new Random();
+
+		int nr = rand.nextInt((ports.size() - 1) + 1);
+
+		return ports.get(nr);
+
+	}
+
 	public JSONObject buildJsonRooms(String status, String reason) {
 
 		JSONObject json = new JSONObject();
@@ -124,7 +218,7 @@ public class ApiUtilities {
 		return json;
 	}
 
-	public JSONObject buildJsonLogin(String status, String reason, String username, String name, String birthdate,
+	public JSONObject buildJsonLogin(HttpExchange exchange, String status, String reason, String username, String name, String birthdate,
 			String country, String points) {
 
 		JSONObject json = new JSONObject();
@@ -146,6 +240,9 @@ public class ApiUtilities {
 				json.put("birthdate", birthdate);
 				json.put("country", country);
 				json.put("points", points);
+				
+				serverData.setPlayerIp(serverData.findPlayer(username), getIPAddress(exchange));
+				
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

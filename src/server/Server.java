@@ -7,6 +7,7 @@ import connection.Database;
 import connection.DatabaseBackup;
 import data.Online;
 import data.ServerData;
+import gameEngine.Category;
 import gameEngine.GameRoom;
 import gameEngine.RoomsEngine;
 import https.HttpsConnection;
@@ -98,7 +99,7 @@ public class Server {
 	 */
 	public void setupHttpsConnection() {
 
-		connection = new HttpsConnection(database, roomsEngine, online);
+		connection = new HttpsConnection(database, roomsEngine, online, serverData);
 		connection.setup();
 
 	}
@@ -158,7 +159,6 @@ public class Server {
 		roomsEngine.addRoom(room9);
 		roomsEngine.addRoom(room10);
 		
-
 		online = new Online();
 
 	}

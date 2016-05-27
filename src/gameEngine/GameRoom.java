@@ -9,41 +9,33 @@ import java.util.Random;
 import data.Player;
 
 public class GameRoom implements Runnable {
-	
+
+	private Category category;
 	private Thread t;
-	
+
 	private String id;
 	private String threadName;
-	private int rounds;
-	
+	private int tcp_port;
+	private String catg;
+	private Player drawer;
+
 	private HashMap<Integer, Integer> leaderboard;
-	private ArrayList<String> words;
 	private ArrayList<Player> players;
 
-	public GameRoom(String id, String name, int rounds) {
+	public GameRoom(String id, String name, int tcp_port) {
+		category = new Category();
 		threadName = name;
-		
+
 		this.id = id;
-		this.rounds = rounds;
-		
-		this.words = new ArrayList<String>();
+		this.tcp_port = tcp_port;
+		this.drawer = null;
+
 		this.leaderboard = new HashMap<Integer, Integer>();
 		this.players = new ArrayList<Player>();
 	}
 
 	public void run() {
 
-		for (int i = 0; i < this.rounds; i++) {
-
-			//String currentDraw = randomWord();
-
-			/*
-			 * if (alguém_acertou){ atualizaPontuação(); continue; }
-			 */
-
-		}
-
-		// System.out.println("Thread " + threadName + " exiting.");
 	}
 
 	public void start() {
@@ -53,8 +45,10 @@ public class GameRoom implements Runnable {
 			t.start();
 		}
 	}
-	
-	
+
+	public void setPort(int port) {
+		this.tcp_port = port;
+	}
 
 	public boolean connectPlayer(Player player) {
 		if (this.leaderboard.size() >= 10)
@@ -64,45 +58,55 @@ public class GameRoom implements Runnable {
 			return true;
 		}
 	}
-	
-	public String getID(){
+
+	public String getID() {
 		return id;
 	}
-	
-	public ArrayList<Player> getPlayers(){
+
+	public void setDrawer(Player player) {
+		drawer = player;
+	}
+
+	public ArrayList<Player> getPlayers() {
 		return players;
 	}
-	
-	public void addPlayer(Player player){
+
+	public void addPlayer(Player player) {
 		players.add(player);
 	}
 
-	public void generateWordList(String filename) {
+	public String generateWord() {
+		catg = category.getRandomCategory();
+		return catg;
+	}
 
-		this.words.clear();
-		String thisLine;
+	public ArrayList<String> generateWordList() {
 
-		try {
-			// open input stream test.txt for reading purpose.
-			BufferedReader br = new BufferedReader(new FileReader(filename));
+		ArrayList<String> words = new ArrayList<String>();
 
-			while ((thisLine = br.readLine()) != null) {
-				this.words.add(thisLine);
-			}
+		String cat1;
+		String cat2;
+		String cat3;
 
-			br.close();
+		cat1 = catg;
+		cat2 = category.getRandomCategory();
+		cat3 = category.getRandomCategory();
+		
+		while(cat2.equals(catg))
+			cat2 = category.getRandomCategory();
+		while(cat3.equals(catg))
+			cat3 = category.getRandomCategory();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		words.add(cat1);
+		words.add(cat2);
+		words.add(cat3);
+
+		return words;
 
 	}
 
-	public String randomWord() {
-		Random r = new Random();
-		int val = r.nextInt(this.words.size());
-		String s = this.words.get(val);
-		return s;
+	public Player getDrawer() {
+		return drawer;
 	}
 
 }

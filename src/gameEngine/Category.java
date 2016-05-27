@@ -28,7 +28,6 @@ public class Category {
 				counter++;
 			}
 			
-			System.out.println(line);
 			return line;
 			
 		} catch (FileNotFoundException e) {

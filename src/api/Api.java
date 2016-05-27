@@ -15,6 +15,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import connection.Database;
 import data.Online;
+import data.ServerData;
 import gameEngine.RoomsEngine;
 import utilities.Constants;
 
@@ -24,13 +25,15 @@ public class Api implements HttpHandler {
 	private RoomsEngine roomsEngine;
 	private Online online;
 	private ApiUtilities apiUt;
+	private ServerData serverData;
 
-	public Api(Database database, RoomsEngine roomsEngine, Online online) {
+	public Api(Database database, RoomsEngine roomsEngine, Online online, ServerData serverData) {
 		this.database = database;
 		this.roomsEngine = roomsEngine;
 		this.online = online;
+		this.serverData = serverData;
 
-		this.apiUt = new ApiUtilities(this.online);
+		this.apiUt = new ApiUtilities(this.online, this.serverData);
 	}
 
 	@Override
@@ -152,10 +155,10 @@ public class Api implements HttpHandler {
 		String response_code = user.UserGET();
 
 		if (response_code.equals(Constants.ERROR_USER_EMAIL)) {
-			json = apiUt.buildJsonLogin(Constants.ERROR, "Invalid email!", null, null, null, null, null);
+			json = apiUt.buildJsonLogin(exchange, Constants.ERROR, "Invalid email!", null, null, null, null, null);
 			apiUt.response(exchange, json.toString());
 		} else if (response_code.equals(Constants.ERROR_USER_PASSWORD)) {
-			json = apiUt.buildJsonLogin(Constants.ERROR, "Invalid password!", null, null, null, null, null);
+			json = apiUt.buildJsonLogin(exchange, Constants.ERROR, "Invalid password!", null, null, null, null, null);
 			apiUt.response(exchange, json.toString());
 		} else {
 
@@ -165,14 +168,14 @@ public class Api implements HttpHandler {
 				if (result.next()) {
 
 					if (response_code.equals(Constants.OK)) {
-						json = apiUt.buildJsonLogin(Constants.OK, null, result.getString("username"),
+						json = apiUt.buildJsonLogin(exchange, Constants.OK, null, result.getString("username"),
 								result.getString("name"), result.getString("birthdate"), result.getString("country"),
 								result.getString("points"));
 
 						apiUt.setupOnline(result, exchange);
 						apiUt.response(exchange, json.toString());
 					} else {
-						json = apiUt.buildJsonLogin(Constants.ERROR, "Unknown Error!", null, null, null, null, null);
+						json = apiUt.buildJsonLogin(exchange, Constants.ERROR, "Unknown Error!", null, null, null, null, null);
 						apiUt.response(exchange, json.toString());
 					}
 
@@ -319,6 +322,7 @@ public class Api implements HttpHandler {
 	private void handleRoomGET(HttpExchange exchange, String rooms) {
 
 		Room room = new Room(roomsEngine, rooms);
+		String ip = apiUt.getIPAddress(exchange);
 
 		JSONObject json;
 
@@ -333,7 +337,7 @@ public class Api implements HttpHandler {
 				json = apiUt.buildAllRoomsJson(room);
 				apiUt.response(exchange, json.toString());
 			} else {
-				json = apiUt.createRoomObject(room.getID(), room.getPlayers());
+				json = apiUt.startRoom(exchange, room, ip);
 				apiUt.response(exchange, json.toString());
 			}
 		}

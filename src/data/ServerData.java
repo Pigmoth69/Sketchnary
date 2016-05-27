@@ -47,5 +47,34 @@ public class ServerData {
 		
 		return -1;
 	}
+
+	public Player findPlayerThroughIp(String ip) {
+		
+		for(int i = 0; i < players.size(); i++){
+			
+			if(players.get(i).getIp().equals(ip))
+				return players.get(i);
+			
+		}
+		
+		return null;
+	}
+	
+	public Player findPlayer(String username){
+		
+		for(int i = 0; i < players.size(); i++){
+			
+			if(players.get(i).getUsername().equals(username))
+				return players.get(i);
+			
+		}
+		
+		return null;
+		
+	}
+	
+	public void setPlayerIp(Player pl, String ip){
+		pl.setIpAddress(ip);
+	}
 	
 }

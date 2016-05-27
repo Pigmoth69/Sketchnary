@@ -14,6 +14,7 @@ import com.sun.net.httpserver.HttpsServer;
 import api.Api;
 import connection.Database;
 import data.Online;
+import data.ServerData;
 import gameEngine.RoomsEngine;
 
 public class HttpsConnection {
@@ -21,11 +22,13 @@ public class HttpsConnection {
 	private Database database;
 	private RoomsEngine roomsEngine;
 	private Online online;
+	private ServerData serverData;
 
-	public HttpsConnection(Database database, RoomsEngine roomsEngine, Online online) {
+	public HttpsConnection(Database database, RoomsEngine roomsEngine, Online online, ServerData serverData) {
 		this.database = database;
 		this.roomsEngine = roomsEngine;
 		this.online = online;
+		this.serverData = serverData;
 	}
 
 	private SSLContext createSSLContext() {
@@ -59,7 +62,7 @@ public class HttpsConnection {
 			httpserver = HttpsServer.create(new InetSocketAddress(443), 0);
 			httpserver.setHttpsConfigurator(new HttpsConfigurator(createSSLContext()));
 
-			httpserver.createContext("/api", new Api(database, roomsEngine, online));
+			httpserver.createContext("/api", new Api(database, roomsEngine, online, serverData));
 			httpserver.setExecutor(null);
 			httpserver.start();
 
