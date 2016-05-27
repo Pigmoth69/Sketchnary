@@ -62,6 +62,8 @@ public class HttpsConnection {
 			httpserver.createContext("/api", new Api(database, roomsEngine, online));
 			httpserver.setExecutor(null);
 			httpserver.start();
+			
+			System.out.println("hdfkhjdf");
 
 		} catch (IOException e) {
 			e.printStackTrace();

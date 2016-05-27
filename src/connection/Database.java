@@ -7,7 +7,6 @@ import java.sql.Statement;
 import data.Friend;
 import data.Player;
 import data.ServerData;
-import manager.Manager;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,7 +16,6 @@ import java.sql.SQLException;
 public class Database {
 
 	private ServerData serverData;
-	private DatabaseTracker databaseTracker;
 
 	private String host;
 	private String username;
@@ -26,8 +24,6 @@ public class Database {
 	private Connection connection;
 
 	public Database(ServerData serverData, String host, String username, String password) {
-		this.databaseTracker = new DatabaseTracker();
-
 		this.serverData = serverData;
 		this.host = host;
 		this.username = username;
@@ -38,11 +34,6 @@ public class Database {
 
 	public void setup() {
 		setConnection();
-	}
-
-	public void setupTracker(Manager manager) {
-		databaseTracker.setManager(manager);
-		databaseTracker.start();
 	}
 
 	private void setConnection() {
@@ -87,8 +78,6 @@ public class Database {
 	public void recoverDatabase() {
 
 		Statement recover;
-		String player_query;
-		String friend_query;
 
 		try {
 			recover = connection.createStatement();
@@ -101,15 +90,6 @@ public class Database {
 						player.getString("name"), player.getString("email"), player.getString("birthdate"),
 						player.getString("country"), player.getInt("points"));
 				serverData.addPlayer(pl);
-
-				player_query = "INSERT INTO player (username, password, name, email, birthdate, country, points) VALUES ('"
-						+ player.getString("username") + "','" + player.getString("password") + "','"
-						+ player.getString("name") + "','" + player.getString("email") + "','"
-						+ player.getString("birthdate") + "','" + player.getString("country") + "',"
-						+ player.getInt("points") + ");";
-
-				databaseTracker.addQuery(player_query);
-
 			}
 
 			ResultSet friend = recover.executeQuery("SELECT * FROM friend");
@@ -118,12 +98,6 @@ public class Database {
 
 				Friend fr = new Friend(friend.getInt("id_player"), friend.getInt("id_friend"));
 				serverData.addFriend(fr);
-
-				friend_query = "INSERT INTO friend (id_player, id_friend) VALUES (" + friend.getInt("id_player") + ","
-						+ friend.getInt("id_friend") + ");";
-
-				databaseTracker.addQuery(friend_query);
-
 			}
 
 		} catch (SQLException e) {
@@ -191,8 +165,6 @@ public class Database {
 
 			edit.executeUpdate(query);
 
-			databaseTracker.addQuery(query);
-
 			return true;
 
 		} catch (SQLException e) {
@@ -215,8 +187,6 @@ public class Database {
 
 			edit.executeUpdate(query);
 
-			databaseTracker.addQuery(query);
-
 			return true;
 
 		} catch (SQLException e) {
@@ -238,9 +208,7 @@ public class Database {
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-
-			databaseTracker.addQuery(query);
-
+			
 			return true;
 
 		} catch (SQLException e) {
@@ -262,8 +230,6 @@ public class Database {
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-
-			databaseTracker.addQuery(query);
 
 			return true;
 
@@ -287,8 +253,6 @@ public class Database {
 
 			edit.executeUpdate(query);
 
-			databaseTracker.addQuery(query);
-
 			return true;
 
 		} catch (SQLException e) {
@@ -310,8 +274,6 @@ public class Database {
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-
-			databaseTracker.addQuery(query);
 
 			return true;
 
@@ -398,12 +360,6 @@ public class Database {
 			}
 		}
 
-		query = "INSERT INTO Player (username, password, name, email, birthdate, country, points) VALUES ('" + username
-				+ "','" + password + "','" + name + "','" + email + "','" + birthdate + "','" + country + "', " + points
-				+ ");";
-
-		databaseTracker.addQuery(query);
-
 		return Constants.OK;
 
 	}
@@ -420,8 +376,6 @@ public class Database {
 			delete = connection.createStatement();
 
 			delete.executeUpdate(query);
-
-			databaseTracker.addQuery(query);
 
 			return true;
 

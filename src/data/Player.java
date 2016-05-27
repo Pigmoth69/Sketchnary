@@ -12,6 +12,7 @@ public class Player {
 	private String birthdate;
 	private String country;
 	private int points;
+	private String ip_address;
 	
 	private ArrayList<Player> friends;
 
@@ -25,6 +26,8 @@ public class Player {
 		this.birthdate = birthdate;
 		this.country = country;
 		this.points = points;
+		
+		this.ip_address = null;
 		
 		friends = new ArrayList<Player>();
 		
@@ -60,6 +63,14 @@ public class Player {
 	
 	public int getPoints(){
 		return points;
+	}
+	
+	public String getIp(){
+		return ip_address;
+	}
+	
+	public void setIpAddress(String ip){
+		ip_address = ip;
 	}
 	
 	public ArrayList<Player> getFriends(){

@@ -32,6 +32,43 @@ public class TCPClient {
 		outToServer.writeBytes(sentence + '\n');
 
 	}
+	
+	public void sendFile(String filepath) {
+
+		DataOutputStream outToClient;
+		BufferedOutputStream out = null;
+
+		try {
+			outToClient = new DataOutputStream(clientSocket.getOutputStream());
+
+			out = new BufferedOutputStream(outToClient);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		File myFile = new File(filepath);
+		byte[] mybytearray = new byte[(int) myFile.length()];
+
+		FileInputStream fis = null;
+
+		try {
+			fis = new FileInputStream(myFile);
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
+		}
+
+		BufferedInputStream bis = new BufferedInputStream(fis);
+
+		try {
+			bis.read(mybytearray, 0, mybytearray.length);
+			out.write(mybytearray, 0, mybytearray.length);
+			out.flush();
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+
+	}
 
 	public Socket getClientSocket() {
 		return clientSocket;

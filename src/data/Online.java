@@ -10,8 +10,9 @@ public class Online {
 		onlinePlayers = new ArrayList<Player>();
 	}
 	
-	public void addPlayer(Player player){
+	public void addPlayer(Player player, String ip){
 		onlinePlayers.add(player);
+		player.setIpAddress(ip);
 	}
 	
 	public Boolean isPlayerOnline(Player player){

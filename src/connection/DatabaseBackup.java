@@ -6,15 +6,26 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseBackup {
+import tcpConnection.TCPClient;
 
-	public DatabaseBackup() {
+public class DatabaseBackup implements Runnable {
+
+	private TCPClient tcp;
+
+	private String filename = "D:\\sketchnary.backup";
+
+	public DatabaseBackup(TCPClient tcp) {
+		this.tcp = tcp;
+	}
+	
+	public void start(){
+		new Thread(this).start();
 	}
 
-	public void restore() {
+	public void backup() {
 
 		final List<String> comands = new ArrayList<String>();
-		
+
 		comands.add("C:\\Program Files\\PostgreSQL\\9.4\\bin\\pg_dump.exe");
 		comands.add("-h");
 		comands.add("localhost");
@@ -24,34 +35,57 @@ public class DatabaseBackup {
 		comands.add("postgres");
 		comands.add("-F");
 		comands.add("c");
-		comands.add("-b");
+		comands.add("-a");
 		comands.add("-v");
 		comands.add("-f");
-		comands.add("D:\\bkp.backup");
+		comands.add("D:\\sketchnary.backup");
 		comands.add("sketchnary");
-		
+
 		ProcessBuilder pb = new ProcessBuilder(comands);
 		pb.environment().put("PGPASSWORD", "database123");
-		
+
 		try {
-			
+
 			final Process process = pb.start();
 			final BufferedReader r = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			String line = r.readLine();
-			
+
 			while (line != null) {
 				System.err.println(line);
 				line = r.readLine();
 			}
-			
+
 			r.close();
 			process.waitFor();
 			process.destroy();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException ie) {
 			ie.printStackTrace();
+		}
+
+	}
+
+	public void sendBackup() {
+		System.out.println("[DATABASE BACKUP] Sending backup");
+		tcp.sendFile(filename);
+	}
+
+	@Override
+	public void run() {
+
+		while (true) {
+
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			backup();
+			sendBackup();
+
 		}
 
 	}
