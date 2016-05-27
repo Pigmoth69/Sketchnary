@@ -48,6 +48,7 @@ public class TCPClient {
 
 		File myFile = new File(filepath);
 		byte[] mybytearray = new byte[(int) myFile.length()];
+		System.out.print("SIZE ---> " + mybytearray.length);
 
 		FileInputStream fis = null;
 

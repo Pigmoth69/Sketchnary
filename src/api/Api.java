@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sun.net.httpserver.Headers;
@@ -28,7 +29,7 @@ public class Api implements HttpHandler {
 		this.database = database;
 		this.roomsEngine = roomsEngine;
 		this.online = online;
-		
+
 		this.apiUt = new ApiUtilities(this.online);
 	}
 
@@ -95,22 +96,20 @@ public class Api implements HttpHandler {
 		String country = null;
 		String points = null;
 
-		if (filtered.containsKey("password"))
-			password = filtered.get("password");
-		if (filtered.containsKey("name"))
-			name = filtered.get("name");
-		if (filtered.containsKey("username"))
-			username = filtered.get("username");
-		if (filtered.containsKey("birthdate"))
-			birthdate = filtered.get("birthdate");
-		if (filtered.containsKey("country"))
-			country = filtered.get("country");
-		if (filtered.containsKey("points"))
-			points = filtered.get("points");
-
 		switch (method) {
 		case "GET":
 			System.out.println("[USER EVENT] Processing GET request");
+			if (filtered.containsKey("password"))
+				password = filtered.get("password");
+			if (filtered.containsKey("name"))
+				name = filtered.get("name");
+			if (filtered.containsKey("username"))
+				username = filtered.get("username");
+			if (filtered.containsKey("birthdate"))
+				birthdate = filtered.get("birthdate");
+			if (filtered.containsKey("country"))
+				country = filtered.get("country");
+
 			if (email == null)
 				apiUt.response(exchange, "Invalid email!");
 			else if (password == null)
@@ -120,25 +119,11 @@ public class Api implements HttpHandler {
 			break;
 		case "POST":
 			System.out.println("[USER EVENT] Processing POST request");
-			if (username == null)
-				apiUt.response(exchange, "Null Username!");
-			else
-				handleUserPOST(exchange, username, password, name, email, birthdate, country, points);
+			handleUserPOST(exchange, username, password, name, email, birthdate, country, points);
 			break;
 		case "PUT":
 			System.out.println("[USER EVENT] Processing PUT request");
-			if (username == null)
-				apiUt.response(exchange, "Null Username!");
-			else if (password == null)
-				apiUt.response(exchange, "Null Password!");
-			else if (name == null)
-				apiUt.response(exchange, "Null Name!");
-			else if (email == null)
-				apiUt.response(exchange, "Null Email!");
-			else if (birthdate == null)
-				apiUt.response(exchange, "Invalid Birthdate!");
-			else
-				handleUserPUT(exchange, username, password, name, email, birthdate, country, points);
+			handleUserPUT(exchange, body);
 			break;
 		case "DELETE":
 			System.out.println("[USER EVENT] Processing DELETE request");
@@ -165,31 +150,36 @@ public class Api implements HttpHandler {
 		ResultSet result;
 
 		String response_code = user.UserGET();
-		result = user.getPlayerInfo(email);
 
-		try {
-			if (result.next()) {
+		if (response_code.equals(Constants.ERROR_USER_EMAIL)) {
+			json = apiUt.buildJsonLogin(Constants.ERROR, "Invalid email!", null, null, null, null, null);
+			apiUt.response(exchange, json.toString());
+		} else if (response_code.equals(Constants.ERROR_USER_PASSWORD)) {
+			json = apiUt.buildJsonLogin(Constants.ERROR, "Invalid password!", null, null, null, null, null);
+			apiUt.response(exchange, json.toString());
+		} else {
 
-				if (response_code.equals(Constants.ERROR_USER_EMAIL)) {
-					json = apiUt.buildJsonLogin(Constants.ERROR, "Invalid email!", null, null, null, null, null);
-					apiUt.response(exchange, json.toString());
-				} else if (response_code.equals(Constants.ERROR_USER_PASSWORD)) {
-					json = apiUt.buildJsonLogin(Constants.ERROR, "Invalid password!", null, null, null, null, null);
-					apiUt.response(exchange, json.toString());
-				} else if (response_code.equals(Constants.OK)) {
-					json = apiUt.buildJsonLogin(Constants.OK, null, result.getString("username"), result.getString("name"),
-							result.getString("birthdate"), result.getString("country"), result.getString("points"));
-					
-					apiUt.setupOnline(result, exchange);
-					apiUt.response(exchange, json.toString());
-				} else {
-					json = apiUt.buildJsonLogin(Constants.ERROR, "Unknown Error!", null, null, null, null, null);
-					apiUt.response(exchange, json.toString());
+			result = user.getPlayerInfo(email);
+
+			try {
+				if (result.next()) {
+
+					if (response_code.equals(Constants.OK)) {
+						json = apiUt.buildJsonLogin(Constants.OK, null, result.getString("username"),
+								result.getString("name"), result.getString("birthdate"), result.getString("country"),
+								result.getString("points"));
+
+						apiUt.setupOnline(result, exchange);
+						apiUt.response(exchange, json.toString());
+					} else {
+						json = apiUt.buildJsonLogin(Constants.ERROR, "Unknown Error!", null, null, null, null, null);
+						apiUt.response(exchange, json.toString());
+					}
+
 				}
-
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
 
 	}
@@ -241,18 +231,29 @@ public class Api implements HttpHandler {
 	 * @param birthdate
 	 * @param country
 	 */
-	private void handleUserPUT(HttpExchange exchange, String username, String password, String name, String email,
-			String birthdate, String country, String points) {
+	private void handleUserPUT(HttpExchange exchange, String body) {
 
-		User user = new User(database, email, password);
+		User user = new User(database);
 
-		user.setName(name);
-		user.setUsername(username);
-		user.setBirthdate(birthdate);
-		user.setCountry(country);
-		user.setPoints(Integer.parseInt(points));
-
-		JSONObject json;
+		JSONObject json = null;
+		try {
+			json = new JSONObject(body);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			user.setEmail(json.getString("email"));
+			user.setPassword(json.getString("password"));
+			user.setUsername(json.getString("username"));
+			user.setName(json.getString("name"));
+			user.setBirthdate(json.getString("birthdate"));
+			System.out.println(json.getString("birthdate"));
+			user.setCountry(json.getString("country"));
+			user.setPoints(10);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 
 		String response_code = user.UserPUT();
 

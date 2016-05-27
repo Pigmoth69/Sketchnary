@@ -46,6 +46,8 @@ public class ApiUtilities {
 		}
 
 		OutputStream output = exchange.getResponseBody();
+		
+		System.out.println(message);
 
 		try {
 			output.write(message.getBytes());
@@ -168,6 +170,7 @@ public class ApiUtilities {
 		} else {
 
 			try {
+				System.out.println("aqui");
 				json.put("status", status);
 			} catch (JSONException e) {
 				e.printStackTrace();

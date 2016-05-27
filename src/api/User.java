@@ -23,6 +23,18 @@ public class User {
 		this.password = password;
 	}
 	
+	public User(Database database){
+		this.database = database;
+	}
+	
+	public void setEmail(String email){
+		this.email = email;
+	}
+	
+	public void setPassword(String password){
+		this.password = password;
+	}
+	
 	public void setName(String name){
 		this.name = name;
 	}
@@ -51,8 +63,10 @@ public class User {
 		
 		String status = database.playerVerification(email, password);
 		
-		if(status.equals("email"))
+		if(status.equals("email")){
+			System.out.println("cheguei");
 			return Constants.ERROR_USER_EMAIL;
+		}
 		else if(status.equals("password"))
 			return Constants.ERROR_USER_PASSWORD;
 		else if(status.equals("true"))

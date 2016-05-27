@@ -334,7 +334,7 @@ public class Database {
 
 		} catch (SQLException e) {
 			error = e.getSQLState();
-			System.out.println("Error code " + error);
+			System.out.println("[DATABASE] Error code " + error);
 			if (error.equals("23505"))
 				return Constants.ERROR_DB_DUPLICATE_EMAIL;
 		}

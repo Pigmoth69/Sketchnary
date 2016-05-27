@@ -92,27 +92,37 @@ public class TCPServer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		byte[] aByte = new byte[1];
+
+		byte[] aByte = new byte[1500];
 		int bytesRead;
 
-		if (is != null) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		
+		System.out.println("1");
 
+		if (is != null) {
+			System.out.println("2");
 			FileOutputStream fos = null;
+			BufferedOutputStream bos = null;
 			
 			try {
-				
 				fos = new FileOutputStream("E:\\sketchnary.backup");
+				bos = new BufferedOutputStream(fos);
 				bytesRead = is.read(aByte, 0, aByte.length);
 
 				do {
+					baos.write(aByte);
+					System.out.println("3");
 					bytesRead = is.read(aByte);
+					System.out.println("4");
 				} while (bytesRead != -1);
 
-				fos.write(aByte);
+				bos.write(baos.toByteArray());
+				bos.flush();
+				bos.close();
 				fos.flush();
 				fos.close();
-				
+
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}

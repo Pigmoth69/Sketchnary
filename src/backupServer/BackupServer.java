@@ -40,7 +40,7 @@ public class BackupServer implements Runnable {
 		while (true) {
 			tcpServer.receiveFile();
 			System.out.println("[BACKUP SERVER] Received update");
-			restoreDatabase();
+			//restoreDatabase();
 		}
 
 	}

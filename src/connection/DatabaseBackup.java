@@ -76,15 +76,15 @@ public class DatabaseBackup implements Runnable {
 	public void run() {
 
 		while (true) {
-
+			
+			backup();
+			sendBackup();
+			
 			try {
 				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
-			backup();
-			sendBackup();
 
 		}
 
