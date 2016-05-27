@@ -10,7 +10,7 @@ public class TcpDrawer implements Runnable {
 	private GameRoom room;
 	private Player player;
 	private TCPServer tcp;
-	
+
 	private Boolean alive = true;
 
 	public TcpDrawer(GameRoom room, Player player) {
@@ -25,18 +25,18 @@ public class TcpDrawer implements Runnable {
 
 		tcp.acceptSocket();
 	}
-	
-	public void start(){
+
+	public void start() {
 		new Thread(this).start();
 	}
-	
-	public void kill(){
+
+	public void kill() {
 		alive = false;
 	}
 
 	@Override
 	public void run() {
-		
+
 		startGame();
 
 		while (alive) {
@@ -53,23 +53,26 @@ public class TcpDrawer implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
-	public void propagateBuffer(){
-		
+
+	public void propagateBuffer() {
+
 		try {
-			
+
 			String buffer = tcp.receive();
 			
-			System.out.println("Buffer " + buffer);
-			
-			for(int i = 0; i < room.getGuessers().size(); i++){
-				room.getGuessers().get(i).sendBuffer(buffer);
+			if (buffer != null) {
+				
+				System.out.println("Buffer " + buffer);
+				
+				for (int i = 0; i < room.getGuessers().size(); i++) {
+					room.getGuessers().get(i).sendBuffer(buffer);
+				}
 			}
-		
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }

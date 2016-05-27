@@ -15,7 +15,6 @@ public class GameRoom implements Runnable {
 	private String catg;
 	private Player drawer;
 	private String winner;
-	private int tries = 0;
 	private Boolean on = false;
 
 	private HashMap<Integer, Integer> leaderboard;
@@ -39,7 +38,6 @@ public class GameRoom implements Runnable {
 
 	public void run() {
 
-		// while (winner == null) {
 		startRoom();
 		setupGame();
 
@@ -50,15 +48,22 @@ public class GameRoom implements Runnable {
 	 */
 	public void startRoom() {
 
-		while (players.size() < 2) {}
+		while (players.size() < 2) {
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 
 	}
 
 	private void setupGame() {
 
 		TcpDrawer drawer = new TcpDrawer(this, players.get(0));
-		connectClients();
 		drawer.start();
+		connectClients();
 		System.out.println("end");
 
 	}
@@ -85,8 +90,8 @@ public class GameRoom implements Runnable {
 		on = true;
 	}
 
-	public void setupTcp() {
-
+	public String getCategory() {
+		return catg;
 	}
 
 	public boolean connectPlayer(Player player) {

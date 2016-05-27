@@ -16,11 +16,11 @@ import gameEngine.GameRoom;
 import utilities.Constants;
 
 public class ApiHandler implements Runnable {
-	
+
 	private ApiUtilities apiUt;
 	private Database database;
 	private RoomsEngine roomsEngine;
-	
+
 	private HttpExchange exchange;
 	private String method;
 	private String[] paths;
@@ -31,23 +31,24 @@ public class ApiHandler implements Runnable {
 		this.database = database;
 		this.roomsEngine = roomsEngine;
 	}
-	
-	public void setExchange(HttpExchange exchange){
+
+	public void setExchange(HttpExchange exchange) {
 		this.exchange = exchange;
 	}
-	
-	public void setMethod(String method){
+
+	public void setMethod(String method) {
 		this.method = method;
 	}
-	public void setPaths(String[] paths){
+
+	public void setPaths(String[] paths) {
 		this.paths = paths;
 	}
-	
-	public void setFiltered(Map<String, String> filtered){
+
+	public void setFiltered(Map<String, String> filtered) {
 		this.filtered = filtered;
 	}
-	
-	public void start(){
+
+	public void start() {
 		new Thread(this).start();
 	}
 
@@ -67,8 +68,57 @@ public class ApiHandler implements Runnable {
 			processEventUser(exchange, method, body, paths, filtered);
 		else if (paths[1].equals("room"))
 			processEventRoom(exchange, method, body, paths, filtered);
+		else if (paths[1].equals("game"))
+			processEventGame(exchange, method, body, paths, filtered);
 		else
 			apiUt.response(exchange, "[EVENT] Not an event");
+
+	}
+
+	private void processEventGame(HttpExchange exchange, String method, String body, String[] paths,
+			Map<String, String> filtered) {
+
+		String room = filtered.get("room");
+		String category = filtered.get("word");
+
+		switch (method) {
+		case "GET":
+			System.out.println("[GAME EVENT] Processing GET request");
+			if (room == null)
+				apiUt.response(exchange, "Invalid game request!");
+			else
+				handleGameGET(exchange, room, category);
+			break;
+		case "POST":
+			break;
+		case "PUT":
+			break;
+		case "DELETE":
+			break;
+		default:
+			System.out.println("[GAME EVENT] Unknow request");
+			break;
+		}
+
+	}
+
+	private void handleGameGET(HttpExchange exchange, String room, String category) {
+
+		Game game = new Game(roomsEngine);
+		JSONObject json = new JSONObject();
+
+		try {
+			if (game.isCorrect(room, category)) {
+				json.put("status", "winner");
+				apiUt.response(exchange, json.toString());
+			}else{
+				json.put("status", "looser");
+				apiUt.response(exchange, json.toString());
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -309,7 +359,7 @@ public class ApiHandler implements Runnable {
 		case "DELETE":
 			break;
 		default:
-			System.out.println("[USER EVENT] Unknow request");
+			System.out.println("[ROOM EVENT] Unknow request");
 			break;
 		}
 
@@ -334,7 +384,7 @@ public class ApiHandler implements Runnable {
 				apiUt.response(exchange, json.toString());
 			} else {
 				GameRoom gr = room.findRoom();
-				if(gr.isOff())
+				if (gr.isOff())
 					gr.start();
 				json = apiUt.startRoom(exchange, room, ip, gr);
 				apiUt.response(exchange, json.toString());
