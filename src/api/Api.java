@@ -2,14 +2,8 @@ package api;
 
 import java.io.IOException;
 import java.net.URI;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -17,7 +11,6 @@ import connection.Database;
 import data.Online;
 import data.ServerData;
 import gameEngine.RoomsEngine;
-import utilities.Constants;
 
 public class Api extends Thread implements HttpHandler{
 

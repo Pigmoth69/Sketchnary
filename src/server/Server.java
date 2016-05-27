@@ -1,18 +1,13 @@
 package server;
 
-import java.io.IOException;
-
 import backupServer.BackupServer;
 import connection.Database;
 import connection.DatabaseBackup;
 import data.Online;
 import data.ServerData;
-import gameEngine.Category;
 import gameEngine.GameRoom;
 import gameEngine.RoomsEngine;
 import https.HttpsConnection;
-import tcpConnection.TCPClient;
-import tcpConnection.TCPServer;
 
 public class Server {
 
@@ -24,20 +19,18 @@ public class Server {
 	private Online online;
 
 	private Boolean role;
-	private String hostname;
 	private int port;
 
-	public Server(Boolean role, String hostname, int port) {
+	public Server(Boolean role, int port) {
 		serverData = new ServerData();
 
 		this.role = role;
-		this.hostname = hostname;
 		this.port = port;
 	}
 
 	public static void main(String args[]) {
 
-		if (args.length != 4) {
+		if (args.length != 3) {
 			System.out.println("[SERVER] [ERROR] wrong number of arguments for server");
 			System.exit(0);
 		}
@@ -51,11 +44,11 @@ public class Server {
 		else
 			System.exit(1);
 
-		Server server = new Server(server_role, args[1], Integer.parseInt(args[2]));
+		Server server = new Server(server_role, Integer.parseInt(args[1]));
 		server.setupDatabaseConnection(args[3], "postgres", "database123");
 
 		if (server.role) {
-			//server.setupDatabaseBackup();
+			server.setupDatabaseBackup();
 			server.setupRooms();
 			server.setupHttpsConnection();
 		} else {
@@ -81,15 +74,7 @@ public class Server {
 	 */
 	public void setupDatabaseBackup() {
 
-		TCPClient tcpClient = null;
-		
-		try {
-			tcpClient = new TCPClient(hostname, port);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		DatabaseBackup db = new DatabaseBackup(tcpClient);
+		DatabaseBackup db = new DatabaseBackup();
 		db.start();
 
 	}
@@ -111,19 +96,17 @@ public class Server {
 
 		roomsEngine = new RoomsEngine();
 
-		GameRoom room = new GameRoom("CoolRoom", "room 1", 3);
-		GameRoom room2 = new GameRoom("Thrust", "room 2", 4);
-		GameRoom room3 = new GameRoom("sdkfj", "fwef", 5);
-		GameRoom room4 = new GameRoom("ssretdkfj", "hh", 5);
-		GameRoom room5 = new GameRoom("fg", "ty", 5);
-		GameRoom room6 = new GameRoom("hfg", "ret", 5);
-		GameRoom room7 = new GameRoom("vc", "gsd", 5);
-		GameRoom room8 = new GameRoom("yu", "hdf", 5);
-		GameRoom room9 = new GameRoom("fyu", "ry", 5);
-		GameRoom room10 = new GameRoom("sy", "wer", 5);
+		GameRoom room = new GameRoom("CoolRoom", "room 1");
+		GameRoom room2 = new GameRoom("Thrust", "room 2");
+		GameRoom room3 = new GameRoom("sdkfj", "fwef");
+		GameRoom room4 = new GameRoom("ssretdkfj", "hh");
+		GameRoom room5 = new GameRoom("fg", "ty");
+		GameRoom room6 = new GameRoom("hfg", "ret");
+		GameRoom room7 = new GameRoom("vc", "gsd");
+		GameRoom room8 = new GameRoom("yu", "hdf");
+		GameRoom room9 = new GameRoom("fyu", "ry");
+		GameRoom room10 = new GameRoom("sy", "wer");
 
-		room.addPlayer(serverData.getPlayers().get(2));
-		room.addPlayer(serverData.getPlayers().get(1));
 		room2.addPlayer(serverData.getPlayers().get(0));
 		room2.addPlayer(serverData.getPlayers().get(4));
 		

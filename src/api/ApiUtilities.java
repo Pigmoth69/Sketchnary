@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,7 +21,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpsExchange;
 
 import data.Online;
 import data.Player;
@@ -141,14 +142,18 @@ public class ApiUtilities {
 	public JSONObject startRoom(HttpExchange exchange, Room room, String ip) {
 
 		JSONObject json = new JSONObject();
+		GameRoom gr = null;
 
 		try {
 			int port = getPort();
 			json.put("port", port);
-			GameRoom gr = room.findRoom();
-			gr.setPort(port);
+			InetAddress addr = InetAddress.getLocalHost();
+			String hostaddress = addr.getHostAddress();
+			json.put("host", hostaddress);
+			gr = room.findRoom();
 			
 			Player pl = serverData.findPlayerThroughIp(ip);
+			pl.setPort(port);
 			gr.addPlayer(pl);
 
 			if (gr.getDrawer() == null) {
@@ -175,23 +180,13 @@ public class ApiUtilities {
 
 		} catch (JSONException e) {
 			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
 		}
 
+		gr.start();
 		return json;
 
-	}
-
-	private Player getPlayerFromIp(String ip, GameRoom room) {
-
-		System.out.println(room.getPlayers().size());
-		for (int i = 0; i < room.getPlayers().size(); i++) {
-			System.out.println(room.getPlayers().get(i).getIp());
-			if (room.getPlayers().get(i).getIp().equals(ip))
-				return room.getPlayers().get(i);
-
-		}
-
-		return null;
 	}
 
 	public int getPort() {

@@ -59,7 +59,8 @@ public class HttpsConnection {
 
 		try {
 
-			httpserver = HttpsServer.create(new InetSocketAddress(443), 0);
+			InetSocketAddress address = new InetSocketAddress(443);
+			httpserver = HttpsServer.create(address, 0);
 			httpserver.setHttpsConfigurator(new HttpsConfigurator(createSSLContext()));
 
 			httpserver.createContext("/api", new Api(database, roomsEngine, online, serverData));

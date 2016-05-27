@@ -12,7 +12,9 @@ public class Player {
 	private String birthdate;
 	private String country;
 	private int points;
+	
 	private String ip_address;
+	private int port;
 	
 	private ArrayList<Player> friends;
 
@@ -35,6 +37,10 @@ public class Player {
 	
 	public int getId(){
 		return id;
+	}
+	
+	public int getPort(){
+		return port;
 	}
 	
 	public String getUsername(){
@@ -71,6 +77,10 @@ public class Player {
 	
 	public void setIpAddress(String ip){
 		ip_address = ip;
+	}
+	
+	public void setPort(int port){
+		this.port = port;
 	}
 	
 	public ArrayList<Player> getFriends(){

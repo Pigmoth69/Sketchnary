@@ -6,17 +6,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import tcpConnection.TCPClient;
-
 public class DatabaseBackup implements Runnable {
 
-	private TCPClient tcp;
-
-	private String filename = "D:\\sketchnary.backup";
-
-	public DatabaseBackup(TCPClient tcp) {
-		this.tcp = tcp;
-	}
+	public DatabaseBackup() {}
 	
 	public void start(){
 		new Thread(this).start();
@@ -51,7 +43,6 @@ public class DatabaseBackup implements Runnable {
 			String line = r.readLine();
 
 			while (line != null) {
-				System.err.println(line);
 				line = r.readLine();
 			}
 
@@ -67,18 +58,13 @@ public class DatabaseBackup implements Runnable {
 
 	}
 
-	public void sendBackup() {
-		System.out.println("[DATABASE BACKUP] Sending backup");
-		tcp.sendFile(filename);
-	}
-
 	@Override
 	public void run() {
 
 		while (true) {
 			
+			System.out.println("[DATABASE BACKUP] Backing up the database");
 			backup();
-			sendBackup();
 			
 			try {
 				Thread.sleep(10000);

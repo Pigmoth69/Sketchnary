@@ -32,15 +32,23 @@ public class BackupServer implements Runnable {
 	@Override
 	public void run() {
 		System.out.println("[BACKUP SERVER] Loading");
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		manager();
 	}
 
 	public void manager() {
-
-		while (true) {
-			tcpServer.receiveFile();
-			System.out.println("[BACKUP SERVER] Received update");
-			//restoreDatabase();
+		
+		System.out.println("[BACKUP SERVER] Restoring database");
+		//restoreDatabase();
+		
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -57,7 +65,7 @@ public class BackupServer implements Runnable {
 		command.add("-U");
 		command.add("postgres");
 		command.add("-d");
-		command.add("sketchnary");
+		command.add("backup_sketchnary");
 		command.add("-v");
 		command.add("D:\\sketchnary.backup"); 
 		
@@ -69,11 +77,8 @@ public class BackupServer implements Runnable {
 			final Process process = pb.start();
 			final BufferedReader r = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			
-			System.out.println("[BACKUP SERVER] Restoring database");
-			
 			String line = r.readLine();
 			while (line != null) {
-				System.err.println(line);
 				line = r.readLine();
 			}
 			r.close();

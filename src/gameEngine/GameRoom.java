@@ -1,10 +1,7 @@
 package gameEngine;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 import data.Player;
 
@@ -15,26 +12,65 @@ public class GameRoom implements Runnable {
 
 	private String id;
 	private String threadName;
-	private int tcp_port;
 	private String catg;
 	private Player drawer;
+	private String winner;
+	private int tries = 2;
 
 	private HashMap<Integer, Integer> leaderboard;
 	private ArrayList<Player> players;
+	private ArrayList<String> wordsList;
+	private ArrayList<TcpGuesser> guessers;
 
-	public GameRoom(String id, String name, int tcp_port) {
+	public GameRoom(String id, String name) {
 		category = new Category();
 		threadName = name;
 
 		this.id = id;
-		this.tcp_port = tcp_port;
 		this.drawer = null;
+		this.winner = null;
 
 		this.leaderboard = new HashMap<Integer, Integer>();
 		this.players = new ArrayList<Player>();
+		this.wordsList = new ArrayList<String>();
+		this.guessers = new ArrayList<TcpGuesser>();
 	}
 
 	public void run() {
+		
+		TcpDrawer drawer = new TcpDrawer(this, players.get(0));
+		connectClients();
+		
+		while (winner == null) {
+			if (players.size() < 0)
+				continue;
+			else if (players.size() > 0 && tries > 1){
+				drawer.start();
+			}
+			else {
+
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+				tries++;
+			}
+
+		}
+
+	}
+
+	private void connectClients() {
+
+		for (int i = 0; i < players.size(); i++) {
+			if(players.get(i) != drawer){
+				TcpGuesser guesser = new TcpGuesser(players.get(i));
+				guesser.start();
+				guessers.add(guesser);
+			}
+		}
 
 	}
 
@@ -46,8 +82,8 @@ public class GameRoom implements Runnable {
 		}
 	}
 
-	public void setPort(int port) {
-		this.tcp_port = port;
+	public void setupTcp() {
+
 	}
 
 	public boolean connectPlayer(Player player) {
@@ -91,15 +127,19 @@ public class GameRoom implements Runnable {
 		cat1 = catg;
 		cat2 = category.getRandomCategory();
 		cat3 = category.getRandomCategory();
-		
-		while(cat2.equals(catg))
+
+		while (cat2.equals(catg))
 			cat2 = category.getRandomCategory();
-		while(cat3.equals(catg))
+		while (cat3.equals(catg))
 			cat3 = category.getRandomCategory();
 
 		words.add(cat1);
 		words.add(cat2);
 		words.add(cat3);
+
+		wordsList.add(cat1);
+		wordsList.add(cat2);
+		wordsList.add(cat3);
 
 		return words;
 
@@ -107,6 +147,10 @@ public class GameRoom implements Runnable {
 
 	public Player getDrawer() {
 		return drawer;
+	}
+
+	public ArrayList<TcpGuesser> getGuessers() {
+		return guessers;
 	}
 
 }
