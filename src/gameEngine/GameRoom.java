@@ -38,36 +38,35 @@ public class GameRoom implements Runnable {
 	}
 
 	public void run() {
-		
-		while (winner == null) {
-			if (players.size() < 2){
-				System.out.println("merda");
-				continue;
-			}
-			else if (players.size() >= 2 && tries >= 1){
-				TcpDrawer drawer = new TcpDrawer(this, players.get(0));
-				connectClients();
-				drawer.start();
-				System.out.println("end");
-			}
-			else {
 
-				try {
-					Thread.sleep(1500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				tries++;
-			}
+		// while (winner == null) {
+		startRoom();
+		setupGame();
 
-		}
+	}
+
+	/**
+	 * Hold whilst there are not enough players
+	 */
+	public void startRoom() {
+
+		while (players.size() < 2) {}
+
+	}
+
+	private void setupGame() {
+
+		TcpDrawer drawer = new TcpDrawer(this, players.get(0));
+		connectClients();
+		drawer.start();
+		System.out.println("end");
 
 	}
 
 	private void connectClients() {
 
 		for (int i = 0; i < players.size(); i++) {
-			if(!(players.get(i).getEmail().equals(drawer.getEmail()))){
+			if (!(players.get(i).getEmail().equals(drawer.getEmail()))) {
 				TcpGuesser guesser = new TcpGuesser(players.get(i));
 				guessers.add(guesser);
 				guesser.start();
@@ -156,8 +155,8 @@ public class GameRoom implements Runnable {
 	public ArrayList<TcpGuesser> getGuessers() {
 		return guessers;
 	}
-	
-	public Boolean isOff(){
+
+	public Boolean isOff() {
 		return !on;
 	}
 
