@@ -2,6 +2,7 @@ package gameEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import data.Player;
 
@@ -14,10 +15,10 @@ public class GameRoom implements Runnable {
 	private String threadName;
 	private String catg;
 	private Player drawer;
-	private String winner;
 	private Boolean on = false;
 
 	private HashMap<Integer, Integer> leaderboard;
+	private Map<String, String> playersGuess;
 	private ArrayList<Player> players;
 	private ArrayList<String> wordsList;
 	private ArrayList<TcpGuesser> guessers;
@@ -28,19 +29,17 @@ public class GameRoom implements Runnable {
 
 		this.id = id;
 		this.drawer = null;
-		this.winner = null;
 
 		this.leaderboard = new HashMap<Integer, Integer>();
+		this.playersGuess = new HashMap<String, String>();
 		this.players = new ArrayList<Player>();
 		this.wordsList = new ArrayList<String>();
 		this.guessers = new ArrayList<TcpGuesser>();
 	}
 
 	public void run() {
-
 		startRoom();
 		setupGame();
-
 	}
 
 	/**
@@ -160,9 +159,25 @@ public class GameRoom implements Runnable {
 	public ArrayList<TcpGuesser> getGuessers() {
 		return guessers;
 	}
+	
+	public Map<String, String> getPlayersGuess(){
+		return playersGuess;
+	}
 
 	public Boolean isOff() {
 		return !on;
+	}
+	
+	public void playerGuessed(String guess, Player player){
+		playersGuess.put(player.getEmail(), guess);
+	}
+	
+	public void addPlayerToRoom(Player player){
+		players.add(player);
+	}
+	
+	public void exitRoom(Player player){
+		players.remove(player);
 	}
 
 }

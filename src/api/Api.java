@@ -47,7 +47,7 @@ public class Api extends Thread implements HttpHandler{
 		Map<String, String> filtered = apiUt.filter(query);
 
 		try {
-			this.handler = new ApiHandler(apiUt, database, roomsEngine);
+			this.handler = new ApiHandler(apiUt, database, roomsEngine, serverData);
 			
 			handler.setExchange(exchange);
 			handler.setFiltered(filtered);

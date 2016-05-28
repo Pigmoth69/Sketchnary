@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import data.Player;
+import data.ServerData;
 import gameEngine.GameRoom;
 import gameEngine.RoomsEngine;
 import utilities.Constants;
@@ -31,7 +32,7 @@ public class Room {
 
 			getAllRooms();
 			return Constants.OK;
-			
+
 		} else {
 
 			GameRoom room = findRoom();
@@ -40,31 +41,31 @@ public class Room {
 				addPlayers(room);
 				return Constants.OK;
 			}
-			
+
 		}
-		
+
 		return Constants.ERROR_GR;
 
 	}
-	
-	public String getID(){
+
+	public String getID() {
 		return id;
 	}
 
 	private void getAllRooms() {
-		
-		for(int i = 0; i < rooms.getRooms().size(); i++){
-			allRooms.put(rooms.getRooms().get(i).getID(), rooms.getRooms().get(i).getPlayers());	
+
+		for (int i = 0; i < rooms.getRooms().size(); i++) {
+			allRooms.put(rooms.getRooms().get(i).getID(), rooms.getRooms().get(i).getPlayers());
 		}
-		
+
 	}
 
 	private void addPlayers(GameRoom room) {
-		
-		for(int i = 0; i < room.getPlayers().size(); i++){
+
+		for (int i = 0; i < room.getPlayers().size(); i++) {
 			players.add(room.getPlayers().get(i));
 		}
-		
+
 	}
 
 	public ArrayList<Player> getPlayers() {
@@ -83,9 +84,37 @@ public class Room {
 		return null;
 
 	}
-	
-	public Map<String, ArrayList<Player>> getRooms(){
+
+	public Map<String, ArrayList<Player>> getRooms() {
 		return allRooms;
+	}
+
+	public boolean entry(String room, String ip, ServerData serverData) {
+
+		for (int i = 0; i < rooms.getRooms().size(); i++) {
+
+			if (rooms.getRooms().get(i).getID().equals(room)) {
+				Player player = serverData.findPlayerThroughIp(ip);
+				rooms.getRooms().get(i).addPlayer(player);
+				return true;
+			}
+
+		}
+		return false;
+	}
+
+	public boolean exit(String room, String ip, ServerData serverData) {
+		
+		for (int i = 0; i < rooms.getRooms().size(); i++) {
+
+			if (rooms.getRooms().get(i).getID().equals(room)) {
+				Player player = serverData.findPlayerThroughIp(ip);
+				rooms.getRooms().get(i).exitRoom(player);
+				return true;
+			}
+
+		}
+		return false;
 	}
 
 }

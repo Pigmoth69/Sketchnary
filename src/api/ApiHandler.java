@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,6 +12,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
 import connection.Database;
+import data.ServerData;
 import gameEngine.RoomsEngine;
 import gameEngine.GameRoom;
 import utilities.Constants;
@@ -20,16 +22,18 @@ public class ApiHandler implements Runnable {
 	private ApiUtilities apiUt;
 	private Database database;
 	private RoomsEngine roomsEngine;
+	private ServerData serverData;
 
 	private HttpExchange exchange;
 	private String method;
 	private String[] paths;
 	private Map<String, String> filtered;
 
-	public ApiHandler(ApiUtilities apiUt, Database database, RoomsEngine roomsEngine) {
+	public ApiHandler(ApiUtilities apiUt, Database database, RoomsEngine roomsEngine, ServerData serverData) {
 		this.apiUt = apiUt;
 		this.database = database;
 		this.roomsEngine = roomsEngine;
+		this.serverData = serverData;
 	}
 
 	public void setExchange(HttpExchange exchange) {
@@ -78,18 +82,19 @@ public class ApiHandler implements Runnable {
 	private void processEventGame(HttpExchange exchange, String method, String body, String[] paths,
 			Map<String, String> filtered) {
 
-		String room = filtered.get("room");
-		String category = filtered.get("word");
-
 		switch (method) {
 		case "GET":
+			String room = filtered.get("room");
+
 			System.out.println("[GAME EVENT] Processing GET request");
 			if (room == null)
 				apiUt.response(exchange, "Invalid game request!");
 			else
-				handleGameGET(exchange, room, category);
+				handleGameGET(exchange, room);
 			break;
 		case "POST":
+			System.out.println("[GAME EVENT] Processing POST request");
+			handleGamePOST(exchange, body);
 			break;
 		case "PUT":
 			break;
@@ -102,23 +107,65 @@ public class ApiHandler implements Runnable {
 
 	}
 
-	private void handleGameGET(HttpExchange exchange, String room, String category) {
+	private void handleGamePOST(HttpExchange exchange, String body) {
 
-		Game game = new Game(roomsEngine);
+		JSONObject income;
+		String room = null;
+		String category = null;
+
+		try {
+			income = new JSONObject(body);
+
+			room = income.getString("room");
+			category = income.getString("word");
+
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+
+		Game game = new Game(roomsEngine, serverData);
+		String ip = apiUt.getIPAddress(exchange);
+
 		JSONObject json = new JSONObject();
 
 		try {
-			if (game.isCorrect(room, category)) {
-				json.put("status", "winner");
-				apiUt.response(exchange, json.toString());
-			}else{
-				json.put("status", "looser");
+			if (game.savePlayerAnswer(room, ip, category)) {
+				json.put("status", Constants.OK);
 				apiUt.response(exchange, json.toString());
 			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void handleGameGET(HttpExchange exchange, String room) {
+
+		Game game = new Game(roomsEngine, serverData);
+		
+		JSONObject json = new JSONObject();
+		JSONArray jArray = new JSONArray();
+
+		try {
+			Map<String, Integer> results = game.getResults(room);
+
+			for (Map.Entry<String, Integer> entry : results.entrySet()) {
+
+				JSONObject obj = new JSONObject();
+				obj.put("email", entry.getKey());
+				obj.put("points", entry.getValue());
+				jArray.put(obj);
+
+			}
+			
+			json.put("leaderboard", jArray);
+			json.put("status", Constants.OK);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	
+		apiUt.response(exchange, json.toString());
 
 	}
 
@@ -342,13 +389,16 @@ public class ApiHandler implements Runnable {
 
 		System.out.println("[ROOM EVENT] Processing event");
 
-		String rooms = filtered.get("rooms");
-
 		switch (method) {
 		case "GET":
+			String rooms = filtered.get("rooms");
+			String room = filtered.get("room");
+			String exit = filtered.get("exit");
 			System.out.println("[ROOM EVENT] Processing GET request");
-			if (rooms == null)
-				apiUt.response(exchange, "Invalid room request!");
+			if (rooms == null && exit == null)
+				handleRoomGETEntry(exchange, room);
+			else if (room == null && rooms == null)
+				handleRoomGETExit(exchange, exit);
 			else
 				handleRoomGET(exchange, rooms);
 			break;
@@ -361,6 +411,46 @@ public class ApiHandler implements Runnable {
 		default:
 			System.out.println("[ROOM EVENT] Unknow request");
 			break;
+		}
+
+	}
+
+	private void handleRoomGETExit(HttpExchange exchange, String room) {
+
+		Room r = new Room(roomsEngine, room);
+		String ip = apiUt.getIPAddress(exchange);
+
+		JSONObject json = new JSONObject();
+		try {
+			if (r.exit(room, ip, serverData)) {
+				json.put("status", Constants.OK);
+				apiUt.response(exchange, json.toString());
+			} else {
+				json.put("status", Constants.ERROR);
+				apiUt.response(exchange, json.toString());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private void handleRoomGETEntry(HttpExchange exchange, String room) {
+
+		Room r = new Room(roomsEngine, room);
+		String ip = apiUt.getIPAddress(exchange);
+
+		JSONObject json = new JSONObject();
+		try {
+			if (r.entry(room, ip, serverData)) {
+				json.put("status", Constants.OK);
+				apiUt.response(exchange, json.toString());
+			} else {
+				json.put("status", Constants.ERROR);
+				apiUt.response(exchange, json.toString());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
 
 	}
