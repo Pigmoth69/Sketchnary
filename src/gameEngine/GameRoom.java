@@ -23,6 +23,7 @@ public class GameRoom implements Runnable {
 	private ArrayList<String> wordsList;
 	private ArrayList<TcpGuesser> guessers;
 	private ArrayList<Player> present;
+	private ArrayList<Integer> forbidden;
 
 	public GameRoom(String id, String name) {
 		category = new Category();
@@ -37,6 +38,7 @@ public class GameRoom implements Runnable {
 		this.wordsList = new ArrayList<String>();
 		this.guessers = new ArrayList<TcpGuesser>();
 		this.present = new ArrayList<Player>();
+		this.forbidden = new ArrayList<Integer>();
 	}
 
 	public void run() {
@@ -151,7 +153,7 @@ public class GameRoom implements Runnable {
 
 		while (cat2.equals(catg))
 			cat2 = category.getRandomCategory();
-		while (cat3.equals(catg))
+		while (cat3.equals(catg) && cat3.equals(cat2))
 			cat3 = category.getRandomCategory();
 
 		words.add(cat1);
@@ -192,6 +194,23 @@ public class GameRoom implements Runnable {
 	
 	public void exitRoom(Player player){
 		players.remove(player);
+	}
+
+	public Boolean unsignDrawer() {
+		
+		for(int i = 0; i < players.size(); i++){
+			if(players.get(i) != drawer){
+				drawer = players.get(i);
+				return true;
+			}
+		}
+		
+		return false;
+		
+	}
+	
+	public ArrayList<Integer> getForbidden() {
+		return forbidden;
 	}
 
 }

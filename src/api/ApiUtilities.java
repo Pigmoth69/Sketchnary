@@ -144,7 +144,7 @@ public class ApiUtilities {
 		JSONObject json = new JSONObject();
 
 		try {
-			int port = getPort();
+			int port = getPort(gr);
 			json.put("port", port);
 			InetAddress addr = InetAddress.getLocalHost();
 			String hostaddress = addr.getHostAddress();
@@ -187,12 +187,17 @@ public class ApiUtilities {
 
 	}
 
-	public int getPort() {
+	public int getPort(GameRoom room) {
 
 		Random rand = new Random();
-
 		int nr = rand.nextInt((ports.size() - 1) + 1);
+		int port = ports.get(nr);
+		
+		while(room.getForbidden().contains(port))
+			nr = rand.nextInt((ports.size() - 1) + 1);
 
+		room.getForbidden().add(nr);
+		
 		return ports.get(nr);
 
 	}

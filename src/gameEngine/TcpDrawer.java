@@ -19,7 +19,6 @@ public class TcpDrawer implements Runnable {
 
 		try {
 			this.tcp = new TCPServer(this.player.getPort());
-			System.out.println("PORT "+this.player.getPort());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -48,7 +47,6 @@ public class TcpDrawer implements Runnable {
 
 	public void startGame() {
 		try {
-			System.out.println("STARTTTTTTTT");
 			tcp.send("start");
 			System.out.println("sent start");
 		} catch (IOException e) {

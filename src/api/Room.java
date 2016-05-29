@@ -108,9 +108,16 @@ public class Room {
 		for (int i = 0; i < rooms.getRooms().size(); i++) {
 
 			if (rooms.getRooms().get(i).getID().equals(room)) {
+				
 				Player player = serverData.findPlayerThroughIp(ip);
-				rooms.getRooms().get(i).exitRoom(player);
-				return true;
+				if(player == rooms.getRooms().get(i).getDrawer()){
+					rooms.getRooms().get(i).unsignDrawer();
+					rooms.getRooms().get(i).exitRoom(player);
+					return true;
+				}else{
+					rooms.getRooms().get(i).exitRoom(player);
+					return true;
+				}
 			}
 
 		}

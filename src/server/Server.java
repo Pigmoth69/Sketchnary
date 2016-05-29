@@ -62,7 +62,7 @@ public class Server {
 			server.setupDatabaseBackup();
 			server.setupRooms();
 			server.setupHttpsConnection();
-			server.setupStatus(args[2], Integer.parseInt(args[3]));
+			//server.setupStatus(args[2], Integer.parseInt(args[3]));
 		} else {
 			server.setupBackup(args[2], Integer.parseInt(args[3]));
 		}
