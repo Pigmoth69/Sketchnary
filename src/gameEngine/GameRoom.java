@@ -16,6 +16,7 @@ public class GameRoom implements Runnable {
 	private String catg;
 	private Player drawer;
 	private Boolean on = false;
+	private int port;
 
 	private HashMap<Integer, Integer> leaderboard;
 	private Map<String, String> playersGuess;
@@ -71,7 +72,7 @@ public class GameRoom implements Runnable {
 
 		for (int i = 0; i < players.size(); i++) {
 			if (!(players.get(i).getEmail().equals(drawer.getEmail()))) {
-				TcpGuesser guesser = new TcpGuesser(players.get(i));
+				TcpGuesser guesser = new TcpGuesser(this, players.get(i));
 				guessers.add(guesser);
 				guesser.start();
 				System.out.println("[GAME ROOM] Starting guesser thread");
@@ -87,6 +88,10 @@ public class GameRoom implements Runnable {
 			t.start();
 		}
 		on = true;
+	}
+	
+	public void setPort(int port){
+		this.port = port;
 	}
 
 	public String getCategory() {
@@ -178,6 +183,10 @@ public class GameRoom implements Runnable {
 	
 	public void exitRoom(Player player){
 		players.remove(player);
+	}
+
+	public int getPort() {
+		return port;
 	}
 
 }

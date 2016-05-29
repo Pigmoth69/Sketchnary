@@ -18,7 +18,7 @@ public class TcpDrawer implements Runnable {
 		this.player = player;
 
 		try {
-			this.tcp = new TCPServer(this.player.getPort());
+			this.tcp = new TCPServer(this.room.getPort());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -46,8 +46,13 @@ public class TcpDrawer implements Runnable {
 	}
 
 	public void startGame() {
+
+		String info = player.getEmail() + "&";
+
+		String toSend = info + "start";
+
 		try {
-			tcp.send("start");
+			tcp.send(toSend);
 			System.out.println("sent start");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -58,14 +63,22 @@ public class TcpDrawer implements Runnable {
 
 		try {
 
-			String buffer = tcp.receive();
-			
-			if (buffer != null) {
-				
-				System.out.println("Buffer " + buffer);
-				
-				for (int i = 0; i < room.getGuessers().size(); i++) {
-					room.getGuessers().get(i).sendBuffer(buffer);
+			String received = tcp.receive();
+
+			if (received != null) {
+
+				System.out.println("Buffer " + received);
+
+				String[] parts = received.split("&");
+				String email = parts[0];
+				String buffer = parts[1];
+
+				if (email.equals(player.getEmail())) {
+
+					for (int i = 0; i < room.getGuessers().size(); i++) {
+						room.getGuessers().get(i).sendBuffer(buffer);
+					}
+					
 				}
 			}
 
