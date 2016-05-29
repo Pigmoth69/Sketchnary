@@ -165,14 +165,20 @@ public class ApiUtilities {
 				JSONObject jo1 = new JSONObject();
 				JSONObject jo2 = new JSONObject();
 				JSONObject jo3 = new JSONObject();
+				JSONObject jo4 = new JSONObject();
+				JSONObject jo5 = new JSONObject();
 				jo1.put("1", words.get(0));
 				jo2.put("2", words.get(1));
 				jo3.put("3", words.get(2));
+				jo4.put("4", words.get(3));
+				jo5.put("5", words.get(4));
 
 				JSONArray ja = new JSONArray();
 				ja.put(jo1);
 				ja.put(jo2);
 				ja.put(jo3);
+				ja.put(jo4);
+				ja.put(jo5);
 
 				json.put("words", ja);
 			}
@@ -194,9 +200,9 @@ public class ApiUtilities {
 		int port = ports.get(nr);
 		
 		while(room.getForbidden().contains(port))
-			nr = rand.nextInt((ports.size() - 1) + 1);
+			port = ports.get(rand.nextInt((ports.size() - 1) + 1));
 
-		room.getForbidden().add(nr);
+		room.addForbidden(port);
 		
 		return ports.get(nr);
 
@@ -239,6 +245,7 @@ public class ApiUtilities {
 				json.put("country", country);
 				json.put("points", points);
 				
+				System.out.println(username);
 				serverData.setPlayerIp(serverData.findPlayer(username), getIPAddress(exchange));
 				
 			} catch (JSONException e) {
@@ -265,7 +272,6 @@ public class ApiUtilities {
 		} else {
 
 			try {
-				System.out.println("aqui");
 				json.put("status", status);
 			} catch (JSONException e) {
 				e.printStackTrace();

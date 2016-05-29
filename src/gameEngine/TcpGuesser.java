@@ -50,4 +50,9 @@ public class TcpGuesser implements Runnable {
 		}
 	}
 
+	public void closeSocket() {
+		tcp.closeSocket();
+		
+	}
+
 }

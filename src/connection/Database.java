@@ -208,7 +208,7 @@ public class Database {
 			edit = connection.createStatement();
 
 			edit.executeUpdate(query);
-			
+
 			return true;
 
 		} catch (SQLException e) {
@@ -317,6 +317,7 @@ public class Database {
 		Statement edit;
 		Statement new_edit;
 		Statement safe_edit;
+		Statement id_s;
 		String query;
 
 		String fake_username = "fake";
@@ -358,6 +359,29 @@ public class Database {
 
 				return Constants.ERROR_DB_DUPLICATE_USERNAME;
 			}
+		}
+
+		ResultSet result = null;
+
+		try {
+			id_s = connection.createStatement();
+			result = id_s.executeQuery("SELECT id FROM player WHERE email = '" + email + "';");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			if (result.next()) {
+				Player player = null;
+				try {
+					player = new Player(result.getInt("id"), username, password, name, email, birthdate, country, points);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				serverData.addPlayer(player);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 
 		return Constants.OK;
@@ -415,8 +439,7 @@ public class Database {
 
 			statement = connection.createStatement();
 
-			result = statement.executeQuery(
-					"SELECT * FROM player WHERE email = '" + email + "';");
+			result = statement.executeQuery("SELECT * FROM player WHERE email = '" + email + "';");
 
 		} catch (SQLException e) {
 			e.printStackTrace();

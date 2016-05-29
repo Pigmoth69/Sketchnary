@@ -127,29 +127,6 @@ public class Server {
 		GameRoom room9 = new GameRoom("fyu", "ry");
 		GameRoom room10 = new GameRoom("sy", "wer");
 
-		room2.addPlayer(serverData.getPlayers().get(0));
-		room2.addPlayer(serverData.getPlayers().get(4));
-
-		room3.addPlayer(serverData.getPlayers().get(2));
-		room4.addPlayer(serverData.getPlayers().get(1));
-		room5.addPlayer(serverData.getPlayers().get(0));
-		room5.addPlayer(serverData.getPlayers().get(4));
-
-		room6.addPlayer(serverData.getPlayers().get(2));
-		room7.addPlayer(serverData.getPlayers().get(1));
-		room8.addPlayer(serverData.getPlayers().get(0));
-		room9.addPlayer(serverData.getPlayers().get(4));
-
-		room6.addPlayer(serverData.getPlayers().get(5));
-		room7.addPlayer(serverData.getPlayers().get(6));
-		room8.addPlayer(serverData.getPlayers().get(2));
-		room9.addPlayer(serverData.getPlayers().get(3));
-
-		room10.addPlayer(serverData.getPlayers().get(2));
-		room10.addPlayer(serverData.getPlayers().get(1));
-		room10.addPlayer(serverData.getPlayers().get(0));
-		room10.addPlayer(serverData.getPlayers().get(4));
-
 		roomsEngine.addRoom(room);
 		roomsEngine.addRoom(room2);
 		roomsEngine.addRoom(room3);

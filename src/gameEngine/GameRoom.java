@@ -3,6 +3,7 @@ package gameEngine;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import data.Player;
 
@@ -17,7 +18,6 @@ public class GameRoom implements Runnable {
 	private Player drawer;
 	private Boolean on = false;
 
-	private HashMap<Integer, Integer> leaderboard;
 	private Map<String, String> playersGuess;
 	private ArrayList<Player> players;
 	private ArrayList<String> wordsList;
@@ -32,7 +32,6 @@ public class GameRoom implements Runnable {
 		this.id = id;
 		this.drawer = null;
 
-		this.leaderboard = new HashMap<Integer, Integer>();
 		this.playersGuess = new HashMap<String, String>();
 		this.players = new ArrayList<Player>();
 		this.wordsList = new ArrayList<String>();
@@ -54,7 +53,7 @@ public class GameRoom implements Runnable {
 		while (players.size() < 2) {
 
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -101,15 +100,6 @@ public class GameRoom implements Runnable {
 		return catg;
 	}
 
-	public boolean connectPlayer(Player player) {
-		if (this.leaderboard.size() >= 10)
-			return false;
-		else {
-			this.leaderboard.put(player.getId(), 0);
-			return true;
-		}
-	}
-
 	public String getID() {
 		return id;
 	}
@@ -146,19 +136,43 @@ public class GameRoom implements Runnable {
 		String cat1;
 		String cat2;
 		String cat3;
+		String cat4;
+		String cat5;
 
 		cat1 = catg;
 		cat2 = category.getRandomCategory();
 		cat3 = category.getRandomCategory();
+		cat4 = category.getRandomCategory();
+		cat5 = category.getRandomCategory();
 
 		while (cat2.equals(catg))
 			cat2 = category.getRandomCategory();
 		while (cat3.equals(catg) && cat3.equals(cat2))
 			cat3 = category.getRandomCategory();
+		while (cat4.equals(catg) && cat4.equals(cat2) && cat4.equals(cat3))
+			cat4 = category.getRandomCategory();
+		while (cat5.equals(catg) && cat5.equals(cat2) && cat5.equals(cat3) && cat5.equals(cat4))
+			cat5 = category.getRandomCategory();
 
-		words.add(cat1);
-		words.add(cat2);
-		words.add(cat3);
+		if(getRand() == 1){
+			words.add(cat4);
+			words.add(cat1);
+			words.add(cat5);
+			words.add(cat2);
+			words.add(cat3);
+		}else if(getRand() == 2){
+			words.add(cat5);
+			words.add(cat4);
+			words.add(cat3);
+			words.add(cat1);
+			words.add(cat2);
+		}else{
+			words.add(cat3);
+			words.add(cat5);
+			words.add(cat2);
+			words.add(cat4);
+			words.add(cat1);
+		}
 
 		wordsList.add(cat1);
 		wordsList.add(cat2);
@@ -166,6 +180,10 @@ public class GameRoom implements Runnable {
 
 		return words;
 
+	}
+
+	private int getRand() {
+		return (1 + (int)(Math.random() * 5));
 	}
 
 	public Player getDrawer() {
@@ -193,7 +211,7 @@ public class GameRoom implements Runnable {
 	}
 	
 	public void exitRoom(Player player){
-		players.remove(player);
+		present.remove(player);
 	}
 
 	public Boolean unsignDrawer() {
@@ -211,6 +229,18 @@ public class GameRoom implements Runnable {
 	
 	public ArrayList<Integer> getForbidden() {
 		return forbidden;
+	}
+
+	public void closeSockets() {
+		
+		for(int i = 0; i < guessers.size(); i++){
+			guessers.get(i).closeSocket();
+		}
+		
+	}
+	
+	public void addForbidden(int port){
+		forbidden.add(port);
 	}
 
 }

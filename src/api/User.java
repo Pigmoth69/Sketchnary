@@ -3,6 +3,8 @@ package api;
 import java.sql.ResultSet;
 
 import connection.Database;
+import data.Player;
+import data.ServerData;
 import utilities.Constants;
 
 public class User {

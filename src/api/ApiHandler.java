@@ -145,6 +145,8 @@ public class ApiHandler implements Runnable {
 		
 		JSONObject json = new JSONObject();
 		JSONArray jArray = new JSONArray();
+		
+		roomsEngine.findRoom(room).closeSockets();
 
 		try {
 			Map<String, Integer> results = game.getResults(room);
@@ -269,6 +271,7 @@ public class ApiHandler implements Runnable {
 					} else {
 						json = apiUt.buildJsonLogin(exchange, Constants.ERROR, "Unknown Error!", null, null, null, null,
 								null);
+						System.out.println(password);
 						apiUt.response(exchange, json.toString());
 					}
 
@@ -332,6 +335,7 @@ public class ApiHandler implements Runnable {
 		User user = new User(database);
 
 		JSONObject json = null;
+		
 		try {
 			json = new JSONObject(body);
 		} catch (JSONException e) {
@@ -344,9 +348,9 @@ public class ApiHandler implements Runnable {
 			user.setUsername(json.getString("username"));
 			user.setName(json.getString("name"));
 			user.setBirthdate(json.getString("birthdate"));
-			System.out.println(json.getString("birthdate"));
 			user.setCountry(json.getString("country"));
 			user.setPoints(10);
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

@@ -18,4 +18,15 @@ public class RoomsEngine {
 		rooms.add(room);
 	}
 
+	public GameRoom findRoom(String room) {
+		
+		for(int i = 0; i < rooms.size(); i++){
+			if(room.equals(rooms.get(i).getID())){
+				return rooms.get(i);
+			}
+		}
+		
+		return null;
+	}
+
 }

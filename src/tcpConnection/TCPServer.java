@@ -130,4 +130,13 @@ public class TCPServer {
 
 	}
 
+	public void closeSocket() {
+		try {
+			svSocket.close();
+			connectionSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
