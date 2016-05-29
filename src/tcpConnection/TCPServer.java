@@ -72,6 +72,8 @@ public class TCPServer {
 		BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
 		clientSentence = inFromClient.readLine();
+		
+		System.out.println("RECEIVED TCP " + clientSentence);
 
 		return clientSentence;
 	}

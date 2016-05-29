@@ -30,6 +30,8 @@ public class TCPClient {
 		DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 		
 		outToServer.writeBytes(sentence + '\n');
+		
+		System.out.println("SENT TCP " + sentence);
 
 	}
 	

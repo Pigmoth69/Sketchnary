@@ -16,19 +16,18 @@ public class GameRoom implements Runnable {
 	private String catg;
 	private Player drawer;
 	private Boolean on = false;
-	private int port;
 
 	private HashMap<Integer, Integer> leaderboard;
 	private Map<String, String> playersGuess;
 	private ArrayList<Player> players;
 	private ArrayList<String> wordsList;
 	private ArrayList<TcpGuesser> guessers;
+	private ArrayList<Player> present;
 
-	public GameRoom(String id, String name, int port) {
+	public GameRoom(String id, String name) {
 		category = new Category();
 		threadName = name;
 
-		this.port = port;
 		this.id = id;
 		this.drawer = null;
 
@@ -37,6 +36,7 @@ public class GameRoom implements Runnable {
 		this.players = new ArrayList<Player>();
 		this.wordsList = new ArrayList<String>();
 		this.guessers = new ArrayList<TcpGuesser>();
+		this.present = new ArrayList<Player>();
 	}
 
 	public void run() {
@@ -61,7 +61,7 @@ public class GameRoom implements Runnable {
 	}
 
 	private void setupGame() {
-
+		
 		TcpDrawer drawer = new TcpDrawer(this, players.get(0));
 		drawer.start();
 		connectClients();
@@ -70,10 +70,14 @@ public class GameRoom implements Runnable {
 	}
 
 	private void connectClients() {
-
+		System.out.println("players " + players.size());
+		System.out.println(players);
 		for (int i = 0; i < players.size(); i++) {
+			System.out.println("PLAYER EMAIL " + players.get(i).getEmail());
 			if (!(players.get(i).getEmail().equals(drawer.getEmail()))) {
-				TcpGuesser guesser = new TcpGuesser(this, players.get(i));
+
+				System.out.println("aqui dentro");
+				TcpGuesser guesser = new TcpGuesser(players.get(i));
 				guessers.add(guesser);
 				guesser.start();
 				System.out.println("[GAME ROOM] Starting guesser thread");
@@ -89,10 +93,6 @@ public class GameRoom implements Runnable {
 			t.start();
 		}
 		on = true;
-	}
-	
-	public void setPort(int port){
-		this.port = port;
 	}
 
 	public String getCategory() {
@@ -127,6 +127,14 @@ public class GameRoom implements Runnable {
 	public String generateWord() {
 		catg = category.getRandomCategory();
 		return catg;
+	}
+	
+	public ArrayList<Player> getPresent(){
+		return present;
+	}
+	
+	public void setPresent(Player pl){
+		present.add(pl);
 	}
 
 	public ArrayList<String> generateWordList() {
@@ -184,10 +192,6 @@ public class GameRoom implements Runnable {
 	
 	public void exitRoom(Player player){
 		players.remove(player);
-	}
-
-	public int getPort() {
-		return port;
 	}
 
 }

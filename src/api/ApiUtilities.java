@@ -144,7 +144,7 @@ public class ApiUtilities {
 		JSONObject json = new JSONObject();
 
 		try {
-			int port = gr.getPort();
+			int port = getPort();
 			json.put("port", port);
 			InetAddress addr = InetAddress.getLocalHost();
 			String hostaddress = addr.getHostAddress();
@@ -152,6 +152,7 @@ public class ApiUtilities {
 			gr = room.findRoom();
 			
 			Player pl = serverData.findPlayerThroughIp(ip);
+			pl.setPort(port);
 			gr.addPlayer(pl);
 
 			if (gr.getDrawer() == null) {

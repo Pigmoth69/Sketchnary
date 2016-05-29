@@ -55,7 +55,7 @@ public class Room {
 	private void getAllRooms() {
 
 		for (int i = 0; i < rooms.getRooms().size(); i++) {
-			allRooms.put(rooms.getRooms().get(i).getID(), rooms.getRooms().get(i).getPlayers());
+			allRooms.put(rooms.getRooms().get(i).getID(), rooms.getRooms().get(i).getPresent());
 		}
 
 	}
@@ -95,7 +95,7 @@ public class Room {
 
 			if (rooms.getRooms().get(i).getID().equals(room)) {
 				Player player = serverData.findPlayerThroughIp(ip);
-				rooms.getRooms().get(i).addPlayer(player);
+				rooms.getRooms().get(i).setPresent(player);
 				return true;
 			}
 
