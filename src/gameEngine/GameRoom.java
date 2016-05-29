@@ -24,10 +24,11 @@ public class GameRoom implements Runnable {
 	private ArrayList<String> wordsList;
 	private ArrayList<TcpGuesser> guessers;
 
-	public GameRoom(String id, String name) {
+	public GameRoom(String id, String name, int port) {
 		category = new Category();
 		threadName = name;
 
+		this.port = port;
 		this.id = id;
 		this.drawer = null;
 
