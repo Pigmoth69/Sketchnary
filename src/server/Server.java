@@ -1,6 +1,12 @@
 package server;
 
-import backupServer.BackupServer;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import backupServer.BackupStatus;
 import connection.Database;
 import connection.DatabaseBackup;
 import data.Online;
@@ -13,10 +19,11 @@ public class Server {
 
 	private Database database;
 	private ServerData serverData;
-	private BackupServer backupServer;
+	private BackupStatus backupStatus;
 	private HttpsConnection connection;
 	private RoomsEngine roomsEngine;
 	private Online online;
+	private Status status;
 
 	private Boolean role;
 
@@ -28,7 +35,7 @@ public class Server {
 
 	public static void main(String args[]) {
 
-		if (args.length != 2) {
+		if (args.length != 5) {
 			System.out.println("[SERVER] [ERROR] wrong number of arguments for server");
 			System.exit(0);
 		}
@@ -43,16 +50,38 @@ public class Server {
 			System.exit(1);
 
 		Server server = new Server(server_role);
-		server.setupDatabaseConnection(args[1], "postgres", "database123");
+
+		if (args[4].equals("restore"))
+			server.restoreDatabase();
+		else
+			server.setupDatabaseConnection(args[1], "postgres", "database123");
 
 		if (server.role) {
 			server.setupDatabaseBackup();
 			server.setupRooms();
 			server.setupHttpsConnection();
+			//server.setupStatus(args[2], Integer.parseInt(args[3]));
 		} else {
-			server.setupBackup();
+			server.setupBackup(args[2], Integer.parseInt(args[3]));
 		}
 
+	}
+
+	public void setupStatus(String hostname, int port) {
+		
+		status = new Status(hostname, port);
+		if(!status.connect(port)){
+			status.startAnotherServer();
+			try {
+				Thread.sleep(400);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		while(!status.connect(1937)){}
+		status.start();
+		System.out.println("Started");
+		
 	}
 
 	/**
@@ -107,23 +136,22 @@ public class Server {
 
 		room2.addPlayer(serverData.getPlayers().get(0));
 		room2.addPlayer(serverData.getPlayers().get(4));
-		
-		
+
 		room3.addPlayer(serverData.getPlayers().get(2));
 		room4.addPlayer(serverData.getPlayers().get(1));
 		room5.addPlayer(serverData.getPlayers().get(0));
 		room5.addPlayer(serverData.getPlayers().get(4));
-		
+
 		room6.addPlayer(serverData.getPlayers().get(2));
 		room7.addPlayer(serverData.getPlayers().get(1));
 		room8.addPlayer(serverData.getPlayers().get(0));
 		room9.addPlayer(serverData.getPlayers().get(4));
-		
+
 		room6.addPlayer(serverData.getPlayers().get(5));
 		room7.addPlayer(serverData.getPlayers().get(6));
 		room8.addPlayer(serverData.getPlayers().get(2));
 		room9.addPlayer(serverData.getPlayers().get(3));
-		
+
 		room10.addPlayer(serverData.getPlayers().get(2));
 		room10.addPlayer(serverData.getPlayers().get(1));
 		room10.addPlayer(serverData.getPlayers().get(0));
@@ -139,7 +167,7 @@ public class Server {
 		roomsEngine.addRoom(room8);
 		roomsEngine.addRoom(room9);
 		roomsEngine.addRoom(room10);
-		
+
 		online = new Online();
 
 	}
@@ -147,10 +175,52 @@ public class Server {
 	/**
 	 * Sets up the backup server
 	 */
-	public void setupBackup() {
+	public void setupBackup(String hostname, int port) {
 
-		backupServer = new BackupServer();
-		backupServer.start();
+		backupStatus = new BackupStatus(this, port, hostname);
+		backupStatus.setupTcp();
+		backupStatus.start();
+
+	}
+
+	public void restoreDatabase() {
+
+		final List<String> command = new ArrayList<String>();
+
+		command.add("C:\\Program Files\\PostgreSQL\\9.4\\bin\\pg_restore.exe");
+		command.add("-h");
+		command.add("localhost");
+		command.add("-p");
+		command.add("5432");
+		command.add("-U");
+		command.add("postgres");
+		command.add("-d");
+		command.add("backup_sketchnary");
+		command.add("-v");
+		command.add("D:\\sketchnary.backup");
+
+		ProcessBuilder pb = new ProcessBuilder(command);
+		pb.environment().put("PGPASSWORD", "database123");
+
+		try {
+
+			final Process process = pb.start();
+			final BufferedReader r = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+			String line = r.readLine();
+			while (line != null) {
+				System.err.println(line);
+				line = r.readLine();
+			}
+			r.close();
+			process.waitFor();
+			process.destroy();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException ie) {
+			ie.printStackTrace();
+		}
 
 	}
 

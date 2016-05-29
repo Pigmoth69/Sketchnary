@@ -9,11 +9,11 @@ public class TCPClient {
 	String host;
 	int port;
 	
-	public TCPClient(String host, int port) throws Exception {
+	public TCPClient(String host, int port) throws UnknownHostException, IOException, ConnectException {
 		this.host = host;
 		this.port = port;
 		
-		clientSocket = new Socket(host ,port);
+		clientSocket = new Socket(host,port);
 	}
 	
 	public String receive() throws UnknownHostException, IOException{
