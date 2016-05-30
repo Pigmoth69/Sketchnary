@@ -63,7 +63,7 @@ public class HttpsConnection {
 			httpserver = HttpsServer.create(address, 0);
 			httpserver.setHttpsConfigurator(new HttpsConfigurator(createSSLContext()));
 
-			httpserver.createContext("/api", new Api(database, roomsEngine, online, serverData));
+			httpserver.createContext("/api", new Api(database, roomsEngine, serverData));
 			httpserver.setExecutor(null);
 			httpserver.start();
 

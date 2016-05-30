@@ -16,18 +16,16 @@ public class Api extends Thread implements HttpHandler{
 
 	private Database database;
 	private RoomsEngine roomsEngine;
-	private Online online;
 	private ApiUtilities apiUt;
 	private ServerData serverData;
 	private ApiHandler handler;
 
-	public Api(Database database, RoomsEngine roomsEngine, Online online, ServerData serverData) {
+	public Api(Database database, RoomsEngine roomsEngine, ServerData serverData) {
 		this.database = database;
 		this.roomsEngine = roomsEngine;
-		this.online = online;
 		this.serverData = serverData;
 
-		this.apiUt = new ApiUtilities(this.online, this.serverData);
+		this.apiUt = new ApiUtilities(this.serverData);
 	}
 
 	@Override

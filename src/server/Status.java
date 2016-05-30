@@ -66,13 +66,11 @@ public class Status implements Runnable {
 			}
 			
 			if(connect_tries > 2){
-				System.out.println("MAIOR QUE 3");
+				System.out.println("NO MORE TRIES");
 				break;
 			}
 			
 		}
-		
-		System.out.println("OUT");
 
 		if(connect_tries >= 3 && !success)
 			return false;

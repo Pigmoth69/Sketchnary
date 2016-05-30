@@ -30,13 +30,11 @@ import utilities.Constants;
 
 public class ApiUtilities {
 
-	private Online online;
 	private ServerData serverData;
 
 	private ArrayList<Integer> ports;
 
-	public ApiUtilities(Online online, ServerData serverData) {
-		this.online = online;
+	public ApiUtilities(ServerData serverData) {
 		this.serverData = serverData;
 		
 		ports = new ArrayList<Integer>();
@@ -368,7 +366,7 @@ public class ApiUtilities {
 
 	}
 
-	public void setupOnline(ResultSet result, HttpExchange exchange) {
+	/*public void setupOnline(ResultSet result, HttpExchange exchange) {
 
 		Player player = null;
 		try {
@@ -383,6 +381,6 @@ public class ApiUtilities {
 		online.addPlayer(player, ip);
 		notifyFriends(online.findFriends(player));
 
-	}
+	}*/
 
 }

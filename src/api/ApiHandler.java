@@ -266,7 +266,7 @@ public class ApiHandler implements Runnable {
 								result.getString("name"), result.getString("birthdate"), result.getString("country"),
 								result.getString("points"));
 
-						apiUt.setupOnline(result, exchange);
+						//apiUt.setupOnline(result, exchange);
 						apiUt.response(exchange, json.toString());
 					} else {
 						json = apiUt.buildJsonLogin(exchange, Constants.ERROR, "Unknown Error!", null, null, null, null,

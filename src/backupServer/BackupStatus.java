@@ -99,9 +99,9 @@ public class BackupStatus implements Runnable {
 			
 			while (true) {
 
-				if (tries >= 10) {
-					System.out.println("TRIES MAIOR~");
-					restoreDatabase();
+				if (tries >= 5) {
+					System.out.println("SERVER IS DEAD");
+					//restoreDatabase();
 					System.out.println("RESTORED DATABASE");
 					assumeFunctions();
 					System.out.println("ASSUMING FUNCTIONS");
@@ -146,12 +146,38 @@ public class BackupStatus implements Runnable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+		startAnotherServer();
 
-		server.setupDatabaseBackup();
-		server.setupRooms();
-		server.setupHttpsConnection();
-		server.setupStatus(hostname, port);
+	}
+	
+	public void startAnotherServer() {
 
+		Process library = null;
+		Process p = null;
+		BufferedReader inStream = null;
+
+		System.out.println("[STATUS] Starting another main server");
+
+		try {
+			library = Runtime.getRuntime().exec("javac -cp java-json.jar;postgresql-9.4.1208.jre6.jar Server.java");
+			p = Runtime.getRuntime().exec(
+					"cmd.exe /c cd \"\" & start cmd.exe /k \"java -classpath C:\\Users\\utilizador\\git\\Sketchnary\\bin server.Server main sketchnary localhost 1234 restore");
+		} catch (IOException e) {
+			System.err.println("Error on exec() method");
+			e.printStackTrace();
+		}
+
+		try {
+			inStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			System.out.println(inStream.readLine());
+		} catch (IOException e) {
+			System.err.println("Error on inStream.readLine()");
+			e.printStackTrace();
+		}
+
+		System.out.println("[STATUS] Started main server");
+		
 	}
 
 	public void startAnotherBackup() {
@@ -162,7 +188,7 @@ public class BackupStatus implements Runnable {
 		System.out.println("[STATUS] Starting another backup server");
 
 		try {
-			theProcess = Runtime.getRuntime().exec("java Sketchnary backup backup_sketchnary localhost 1234");
+			theProcess = Runtime.getRuntime().exec("java Sketchnary backup backup_sketchnary localhost 1234 unrestore");
 		} catch (IOException e) {
 			System.err.println("Error on exec() method");
 			e.printStackTrace();
